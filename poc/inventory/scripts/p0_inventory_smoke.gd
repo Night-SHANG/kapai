@@ -327,16 +327,16 @@ func _run_gloot() -> Dictionary:
     inventory.add_child(weight)
     get_root().add_child(inventory)
 
-    var scrap = inventory.create_item("scrap")
-    if scrap == null:
+    var scrap_probe = inventory.create_item("scrap")
+    if scrap_probe == null:
         return {"pass": false, "error": "GLoot create_item(scrap) returned null"}
-    if String(scrap.get_property("source_item_id")) != "scrap":
+    if String(scrap_probe.get_property("source_item_id")) != "scrap":
         return {"pass": false, "error": "GLoot bridge lost source_item_id"}
-    scrap.set_property("stack_size", 120)
-    if not inventory.add_item_autosplitmerge(scrap):
-        return {"pass": false, "error": "GLoot autosplit/merge rejected 120 scrap"}
-    if _gloot_counts(inventory) != [21, 99]:
-        return {"pass": false, "error": "GLoot expected 21 + 99 stacks"}
+    if not _gloot_add_count(inventory, "scrap", 120):
+        return {"pass": false, "error": "GLoot quantity adapter rejected 120 scrap"}
+    var initial_gloot_counts := _gloot_counts(inventory)
+    if initial_gloot_counts != [21, 99]:
+        return {"pass": false, "error": "GLoot expected 21 + 99 stacks, got %s" % initial_gloot_counts}
     if absf(weight.get_occupied_space() - 24.0) > EPS:
         return {"pass": false, "error": "GLoot WeightConstraint total mismatch"}
 
@@ -384,10 +384,12 @@ func _run_gloot() -> Dictionary:
         "commit": "ce88b7adc7b952b4df8ebe4836339de334d0d0cc",
         "license": "MIT",
         "source_bridge": true,
+        "quantity_add_adapter_required": true,
         "stack_split_merge": true,
         "weight_constraint": true,
         "serialization_roundtrip": true,
         "application_specific_rules_still_require_wrapper": [
+            "quantity_add_max_stack_normalization",
             "key_item_policy",
             "secure_storage",
             "module_slot_tags",
@@ -442,17 +444,40 @@ func _find_count(inv: LightweightInventory, item_id: String, count: int) -> int:
     return -1
 
 
+func _gloot_add_count(inventory, prototype_id: String, count: int) -> bool:
+    if count <= 0:
+        return false
+    var probe = inventory.create_item(prototype_id)
+    if probe == null:
+        return false
+    var max_stack := int(probe.get_max_stack_size())
+    if max_stack <= 0:
+        return false
+    var remaining := count
+    while remaining > 0:
+        var item = inventory.create_item(prototype_id)
+        if item == null:
+            return false
+        var chunk := mini(remaining, max_stack)
+        if not item.set_stack_size(chunk):
+            return false
+        if not inventory.add_item_autosplitmerge(item):
+            return false
+        remaining -= chunk
+    return true
+
+
 func _gloot_counts(inventory) -> Array:
     var result: Array = []
     for item in inventory.get_items():
-        result.append(int(item.get_property("stack_size")))
+        result.append(int(item.get_stack_size()))
     result.sort()
     return result
 
 
 func _gloot_find_stack(inventory, count: int):
     for item in inventory.get_items():
-        if int(item.get_property("stack_size")) == count:
+        if int(item.get_stack_size()) == count:
             return item
     return null
 
