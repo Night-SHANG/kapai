@@ -1,4 +1,7 @@
-param([string]$GodotExe = $env:GODOT_EXE)
+param(
+    [string]$GodotExe = $env:GODOT_EXE,
+    [int]$GodotStepTimeoutSeconds = 60
+)
 
 $ErrorActionPreference = "Stop"
 $Here = $PSScriptRoot
@@ -7,32 +10,71 @@ if ([string]::IsNullOrWhiteSpace($GodotExe)) { throw "Pass -GodotExe or set GODO
 if (-not (Test-Path $GodotExe)) { throw "Godot executable not found: $GodotExe" }
 
 function Invoke-Godot {
-    param([string[]]$Arguments,[string]$Label)
+    param(
+        [string[]]$Arguments,
+        [string]$Label,
+        [int]$TimeoutSeconds = $GodotStepTimeoutSeconds
+    )
 
-    $stdoutFile = [System.IO.Path]::GetTempFileName()
-    $stderrFile = [System.IO.Path]::GetTempFileName()
-    try {
-        $p = Start-Process -FilePath $GodotExe -ArgumentList $Arguments -Wait -PassThru -NoNewWindow -RedirectStandardOutput $stdoutFile -RedirectStandardError $stderrFile
-        $stdout = if (Test-Path $stdoutFile) { Get-Content -Raw $stdoutFile } else { "" }
-        $stderr = if (Test-Path $stderrFile) { Get-Content -Raw $stderrFile } else { "" }
-        $combined = ($stdout + [Environment]::NewLine + $stderr).Trim()
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = $GodotExe
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+
+    foreach ($arg in $Arguments) {
+        [void]$psi.ArgumentList.Add([string]$arg)
+    }
+
+    $p = [System.Diagnostics.Process]::new()
+    $p.StartInfo = $psi
+
+    if (-not $p.Start()) {
+        throw "$Label could not start Godot."
+    }
+
+    $stdoutTask = $p.StandardOutput.ReadToEndAsync()
+    $stderrTask = $p.StandardError.ReadToEndAsync()
+
+    $completed = $p.WaitForExit($TimeoutSeconds * 1000)
+    if (-not $completed) {
+        try { $p.Kill($true) } catch {}
+        try { $p.WaitForExit() } catch {}
+
+        $stdout = $stdoutTask.GetAwaiter().GetResult()
+        $stderr = $stderrTask.GetAwaiter().GetResult()
 
         if ($stdout) { Write-Host $stdout.TrimEnd() }
         if ($stderr) { Write-Host $stderr.TrimEnd() }
 
-        foreach ($pattern in @("SCRIPT ERROR:","Parse Error:","Failed to load script","CrashHandlerException:")) {
-            if ($combined.Contains($pattern)) { throw "$Label reported fatal pattern: $pattern" }
+        throw "$Label exceeded hard timeout of $TimeoutSeconds seconds."
+    }
+
+    $stdout = $stdoutTask.GetAwaiter().GetResult()
+    $stderr = $stderrTask.GetAwaiter().GetResult()
+    $combined = ($stdout + [Environment]::NewLine + $stderr).Trim()
+
+    if ($stdout) { Write-Host $stdout.TrimEnd() }
+    if ($stderr) { Write-Host $stderr.TrimEnd() }
+
+    foreach ($pattern in @("SCRIPT ERROR:","Parse Error:","Failed to load script","CrashHandlerException:")) {
+        if ($combined.Contains($pattern)) {
+            throw "$Label reported fatal pattern: $pattern"
         }
-        if ($p.ExitCode -ne 0) { throw "$Label failed with exit code $($p.ExitCode)" }
-        return $combined
     }
-    finally {
-        Remove-Item -Force -ErrorAction SilentlyContinue $stdoutFile,$stderrFile
+
+    if ($p.ExitCode -ne 0) {
+        throw "$Label failed with exit code $($p.ExitCode)"
     }
+
+    return $combined
 }
 
-$versionText = Invoke-Godot -Arguments @("--version") -Label "Godot version"
-if ($versionText -notmatch "^4\.7\.1\.stable") { throw "P0-2 requires Godot 4.7.1 stable. Got: $versionText" }
+$versionText = Invoke-Godot -Arguments @("--version") -Label "Godot version" -TimeoutSeconds 15
+if ($versionText -notmatch "^4\.7\.1\.stable") {
+    throw "P0-2 requires Godot 4.7.1 stable. Got: $versionText"
+}
 
 $Gas = Join-Path $Here "gas"
 $Light = Join-Path $Here "lightweight"
