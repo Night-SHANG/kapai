@@ -56,3 +56,8 @@ Write-Host "[P0-3] Running Phase A draw-model autosim"
 Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/phase_a_draw_models.gd") -Label "P0-3 Phase A" | Out-Null
 
 Write-Host "[P0-3] PHASE A COMPLETE"
+
+Write-Host "[P0-3] Running Phase B action-economy autosim"
+Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/phase_b_action_models.gd") -Label "P0-3 Phase B" | Out-Null
+
+Write-Host "[P0-3] PHASE A + B COMPLETE"
