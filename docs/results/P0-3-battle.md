@@ -88,3 +88,65 @@ Phase B will use per_character_quota and compare:
 - shared 4 AP
 
 No final battle decision until Phase B and later human playtest.
+
+## Phase B — action economy
+
+Run #3: GitHub Actions 36255243466 — SUCCESS
+
+Draw model fixed to:
+per_character_quota
+
+Both models used the same 24-card cost/utility fixture and deterministic seeds.
+
+### 3 Card Plays
+
+- turns: 12000
+- avg cards played: 2.63225
+- budget utilization: 100%
+- fragment turn rate: 0%
+- filler turn rate: 14.2667%
+- high-cost retained rate: 27.0667%
+- all-three-role participation: 47.9417%
+- one-role-only rate: 3.4667%
+- role absence events: 6663
+- deterministic replay: PASS
+
+### Shared 4 AP
+
+- turns: 12000
+- avg cards played: 2.96267
+- budget utilization: 100%
+- fragment turn rate: 0%
+- filler turn rate: 66.0583%
+- high-cost retained rate: 93.225%
+- all-three-role participation: 36.9083%
+- one-role-only rate: 1.55%
+- role absence events: 7757
+- deterministic replay: PASS
+
+## Phase B interpretation
+
+The tested AP fixture did not produce unused-AP fragmentation. Therefore AP fragmentation is not evidence against the AP model in this experiment.
+
+Shared 4 AP did play slightly more cards per turn and had fewer one-role-only turns.
+
+However it also:
+- reduced full three-role participation
+- greatly increased low-value filler plays
+- retained 2-cost cards in hand on most turns
+- required cost values on all cards instead of only rare heavy exceptions
+
+This suggests the AP layer is consuming design space and encouraging arithmetic optimization without providing enough additional tactical benefit in the current battle model.
+
+## Phase B technical winner
+
+3 Card Plays
+
+This remains a technical P0 result, not a claim that the system is already fun.
+
+Phase C next:
+- 1 free Formation Adjustment vs formation costing 1 Card Play
+- Sync generation using Mark consume, Intercept and Link
+- deterministic replay
+
+The final production battle rule still requires later human playtest.
