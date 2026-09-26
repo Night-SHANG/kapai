@@ -1,6 +1,6 @@
 # P0-2 Effect / Status Result
 
-Status: ROUND 1 VERIFIED / ROUND 2 PENDING
+Status: TECHNICAL DECISION COMPLETE — LIGHTWEIGHT SELECTED
 
 Engine: Godot 4.7.1 stable / Windows x64
 
@@ -19,49 +19,76 @@ Lightweight:
 
 Run #3: GitHub Actions 36253352684 — SUCCESS
 
-- [x] GodotGAS imports on 4.7.1
-- [x] TURN_BASED independent from wall-clock delta
-- [x] max stack = 3
-- [x] overflow
-- [x] cleanse by tag
-- [x] GameplayTagQuery
-- [x] equivalent lightweight semantics
-
-GodotGAS observed:
-- query_without_mark passed
-- Mark then query passed
-- Break stack 1/2/3 passed
-- overflow -> Stagger passed
-- declarative cleanse passed
-- _process(60.0) did not expire TURN_BASED state
-- two advance_turn() calls expired a 2-turn Mark
-
-Lightweight matched the same semantics.
-
-Non-fatal GodotGAS observations:
-- missing cue registry warning in the isolated P0 project
-- small ObjectDB/resource leak warnings at immediate test exit
-- runtime requires normal project lifecycle so GameplayCueManager Autoload is available
+Both candidates passed:
+- GameplayTagQuery / require-all-tags equivalent
+- TURN_BASED independent from wall-clock delta
+- max stack = 3
+- overflow -> Stagger
+- cleanse by tag
 
 ## Round 2
 
-Now testing:
+Run #4: GitHub Actions 36253967168 — SUCCESS
 
-- Counter: Battle Harness consumes Counter and enqueues counter action
-- Intercept: Battle Harness rewrites ally target to guardian and consumes Intercept
-- Link: consuming Mark grants Sync
-- Save DTO round-trip
-- deterministic effect state under identical command sequence
-- debug dump stability
-- position modifier apply/revert
-- Battle Harness remains authority; Effect layer does not own battle flow
+GodotGAS:
+- intercept=pass
+- counter=pass
+- link=pass
+- save_dto=pass
+- deterministic=pass
+- position_modifier=pass
+- debug=pass
 
-GodotGAS Save strategy under test:
-- do not serialize Nodes or private plugin fields
-- track public active_effect_added / active_effect_removed signals
-- DTO: effect_id / source_id / stacks / remaining_turns
-- restore by stable effect definition ID
+Lightweight:
+- intercept=pass
+- counter=pass
+- link=pass
+- save_dto=pass
+- deterministic=pass
+- position_modifier=pass
+- debug=pass
+
+Observed stable debug DTO:
+status_counter stacks=1 turns=1 source=char_bastion
+
+## Important architecture result
+
+Counter / Intercept / Link remained controlled by the Battle Harness in both implementations.
+
+Therefore the Effect layer does not need to own battle flow.
+
+This is important because BattleResolver must remain the authority for:
+- action ordering
+- target rewrite
+- reaction timing
+- Sync generation
+- damage resolution
+
+## GodotGAS integration observations
+
+Strengths:
+- mature tag/query vocabulary
+- stack cap/overflow
+- declarative cleanse
+- turn duration
+- attribute modifiers
+
+Costs observed:
+- requires normal project lifecycle for GameplayCueManager Autoload
+- isolated P0 emits missing cue registry warning
+- immediate test exit emits small ObjectDB/resource warnings
+- production Save still requires our own stable-ID DTO bridge
+- includes ability/input/network/cue systems outside current needs
+- v1.1.0 is a same-day breaking release
 
 ## Decision
 
-TBD after Round 2.
+SELECT project-owned lightweight EffectRuntime.
+
+Reason:
+The project needs a compact deterministic turn-based effect domain, while most of GodotGAS's additional surface is unused. The lightweight implementation matched every required P0 semantic and keeps Save, replay and BattleResolver boundaries simpler.
+
+GodotGAS remains a reference implementation, not a production dependency.
+
+See:
+docs/decisions/effect-layer-decision.md
