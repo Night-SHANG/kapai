@@ -61,6 +61,9 @@ if (Get-Command py -ErrorAction SilentlyContinue) { $Python = "py" }
 elseif (Get-Command python -ErrorAction SilentlyContinue) { $Python = "python" }
 else { throw "Python 3 not found (py/python)." }
 
+$RuntimeOut = Join-Path $Here "result\runtime"
+New-Item -ItemType Directory -Force -Path $RuntimeOut | Out-Null
+
 Write-Host "[P0] Generating deterministic fixture"
 & $Python (Join-Path $Here "generate_fixture.py")
 if ($LASTEXITCODE -ne 0) { throw "Fixture generation failed" }
@@ -88,6 +91,10 @@ Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/
 Write-Host "[P0] Running YARD preflight"
 Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/preflight.gd") -Label "YARD preflight" | Out-Null
 
+Write-Host "[P0] Exporting YARD migration manifest"
+Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/export_manifest.gd") -Label "YARD migration export" | Out-Null
+Copy-Item -Force (Join-Path $Yard "result\yard_export.json") (Join-Path $RuntimeOut "yard_export.json")
+
 Write-Host "[P0] Importing DataTables project"
 Invoke-Godot -Arguments @("--headless","--editor","--path",$DataTables,"--import") -Label "DataTables editor import" | Out-Null
 
@@ -100,9 +107,66 @@ Invoke-Godot -Arguments @("--headless","--editor","--path",$DataTables,"--import
 Write-Host "[P0] Running DataTables preflight"
 Invoke-Godot -Arguments @("--headless","--path",$DataTables,"--script","res://scripts/preflight.gd") -Label "DataTables preflight" | Out-Null
 
+Write-Host "[P0] Running DataTables JSON/CSV round-trip"
+Invoke-Godot -Arguments @("--headless","--path",$DataTables,"--script","res://scripts/io_roundtrip.gd") -Label "DataTables IO round-trip" | Out-Null
+Copy-Item -Force (Join-Path $DataTables "result\datatables_export.json") (Join-Path $RuntimeOut "datatables_export.json")
+Copy-Item -Force (Join-Path $DataTables "result\datatables_export.csv") (Join-Path $RuntimeOut "datatables_export.csv")
+
 Write-Host "[P0] Running format/diff/merge analysis"
 & $Python (Join-Path $Here "analyze_formats.py")
 if ($LASTEXITCODE -ne 0) { throw "Format analysis failed" }
 
-Write-Host "[P0] Automated bootstrap and format analysis completed."
-Write-Host "[P0] This is still not the final data-layer decision."
+Write-Host "[P0] Testing additive schema evolution on old serialized data"
+$SchemaRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("kapai-p0-schema-" + [guid]::NewGuid().ToString("N"))
+$YardSchema = Join-Path $SchemaRoot "yard"
+$DataTablesSchema = Join-Path $SchemaRoot "datatables"
+New-Item -ItemType Directory -Force -Path $SchemaRoot | Out-Null
+
+try {
+    Copy-Item -Recurse -Force $Yard $YardSchema
+    Copy-Item -Recurse -Force $DataTables $DataTablesSchema
+
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue (Join-Path $YardSchema ".godot")
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue (Join-Path $DataTablesSchema ".godot")
+
+    $YardSchemaFile = Join-Path $YardSchema "scripts\card_definition.gd"
+    $yardSchemaText = Get-Content -Raw $YardSchemaFile
+    $yardReplacement = "@export var base_value: int = 0" + [Environment]::NewLine + "@export var schema_probe: int = 7"
+    $yardSchemaText = $yardSchemaText.Replace("@export var base_value: int = 0", $yardReplacement)
+    Set-Content -Path $YardSchemaFile -Value $yardSchemaText -Encoding utf8 -NoNewline
+
+    $DataTablesSchemaFile = Join-Path $DataTablesSchema "scripts\card_row.gd"
+    $dtSchemaText = Get-Content -Raw $DataTablesSchemaFile
+    $dtReplacement = "@export var base_value: int = 0" + [Environment]::NewLine + "@export var schema_probe: int = 7"
+    $dtSchemaText = $dtSchemaText.Replace("@export var base_value: int = 0", $dtReplacement)
+    Set-Content -Path $DataTablesSchemaFile -Value $dtSchemaText -Encoding utf8 -NoNewline
+
+    Invoke-Godot -Arguments @("--headless","--editor","--path",$YardSchema,"--import") -Label "YARD schema import" | Out-Null
+    Invoke-Godot -Arguments @("--headless","--path",$YardSchema,"--script","res://scripts/schema_probe.gd") -Label "YARD schema probe" | Out-Null
+
+    Invoke-Godot -Arguments @("--headless","--editor","--path",$DataTablesSchema,"--import") -Label "DataTables schema import" | Out-Null
+    Invoke-Godot -Arguments @("--headless","--path",$DataTablesSchema,"--script","res://scripts/schema_probe.gd") -Label "DataTables schema probe" | Out-Null
+}
+finally {
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $SchemaRoot
+}
+
+Write-Host "[P0] Testing YARD stable ID after physical resource move"
+$OriginalCard = Join-Path $Yard "data\cards\card_bastion_000.tres"
+$MovedDir = Join-Path $Yard "data\cards\moved"
+$MovedCard = Join-Path $MovedDir "card_bastion_000.tres"
+New-Item -ItemType Directory -Force -Path $MovedDir | Out-Null
+
+try {
+    Move-Item -Force $OriginalCard $MovedCard
+    Invoke-Godot -Arguments @("--headless","--editor","--path",$Yard,"--import") -Label "YARD moved resource import" | Out-Null
+    Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/preflight_move.gd") -Label "YARD stable ID move probe" | Out-Null
+}
+finally {
+    if (Test-Path $MovedCard) {
+        Move-Item -Force $MovedCard $OriginalCard
+    }
+}
+
+Write-Host "[P0] Automated P0-1 CI experiments completed."
+Write-Host "[P0] Local Editor UX and real Codex editing remain separate checks before final lock."
