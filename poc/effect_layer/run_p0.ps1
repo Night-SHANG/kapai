@@ -93,4 +93,10 @@ Invoke-Godot -Arguments @("--headless","--editor","--path",$Light,"--import") -L
 Write-Host "[P0-2] Running lightweight core semantics"
 Invoke-Godot -Arguments @("--headless","--path",$Light,"--script","res://scripts/preflight.gd") -Label "Lightweight core" | Out-Null
 
-Write-Host "[P0-2] CORE SEMANTICS COMPLETE"
+Write-Host "[P0-2] Running GodotGAS Round 2 boundary tests"
+Invoke-Godot -Arguments @("--headless","--path",$Gas,"res://round2.tscn") -Label "GodotGAS round2" | Out-Null
+
+Write-Host "[P0-2] Running lightweight Round 2 boundary tests"
+Invoke-Godot -Arguments @("--headless","--path",$Light,"res://round2.tscn") -Label "Lightweight round2" | Out-Null
+
+Write-Host "[P0-2] ROUND 1 + ROUND 2 COMPLETE"

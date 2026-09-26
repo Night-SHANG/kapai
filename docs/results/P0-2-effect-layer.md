@@ -1,6 +1,6 @@
 # P0-2 Effect / Status Result
 
-Status: CORE SEMANTICS NOT RUN
+Status: ROUND 1 VERIFIED / ROUND 2 PENDING
 
 Engine: Godot 4.7.1 stable / Windows x64
 
@@ -17,25 +17,51 @@ Lightweight:
 
 ## Round 1
 
-- [ ] GodotGAS imports on 4.7.1
-- [ ] TURN_BASED independent from wall-clock delta
-- [ ] max stack = 3
-- [ ] overflow
-- [ ] cleanse by tag
-- [ ] GameplayTagQuery
-- [ ] equivalent lightweight semantics
+Run #3: GitHub Actions 36253352684 — SUCCESS
+
+- [x] GodotGAS imports on 4.7.1
+- [x] TURN_BASED independent from wall-clock delta
+- [x] max stack = 3
+- [x] overflow
+- [x] cleanse by tag
+- [x] GameplayTagQuery
+- [x] equivalent lightweight semantics
+
+GodotGAS observed:
+- query_without_mark passed
+- Mark then query passed
+- Break stack 1/2/3 passed
+- overflow -> Stagger passed
+- declarative cleanse passed
+- _process(60.0) did not expire TURN_BASED state
+- two advance_turn() calls expired a 2-turn Mark
+
+Lightweight matched the same semantics.
+
+Non-fatal GodotGAS observations:
+- missing cue registry warning in the isolated P0 project
+- small ObjectDB/resource leak warnings at immediate test exit
+- runtime requires normal project lifecycle so GameplayCueManager Autoload is available
 
 ## Round 2
 
-Pending after Round 1:
-- Counter
-- Intercept
-- Link
+Now testing:
+
+- Counter: Battle Harness consumes Counter and enqueues counter action
+- Intercept: Battle Harness rewrites ally target to guardian and consumes Intercept
+- Link: consuming Mark grants Sync
 - Save DTO round-trip
-- deterministic state
-- debug dump
-- position modifier
+- deterministic effect state under identical command sequence
+- debug dump stability
+- position modifier apply/revert
+- Battle Harness remains authority; Effect layer does not own battle flow
+
+GodotGAS Save strategy under test:
+- do not serialize Nodes or private plugin fields
+- track public active_effect_added / active_effect_removed signals
+- DTO: effect_id / source_id / stacks / remaining_turns
+- restore by stable effect definition ID
 
 ## Decision
 
-TBD.
+TBD after Round 2.
