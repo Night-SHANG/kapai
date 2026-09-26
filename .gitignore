@@ -1,0 +1,25 @@
+# Godot editor/import caches
+**/.godot/
+**/.import/
+
+# P0 dependencies are installed from pinned upstream refs
+poc/**/addons/
+
+# Local dependency/download cache
+.cache/
+
+# Generated P0 fixtures and runtime data
+poc/data_layer/fixtures/generated/
+poc/data_layer/yard/fixtures/
+poc/data_layer/datatables/fixtures/
+poc/data_layer/yard/data/
+poc/data_layer/datatables/data/
+
+# Local result artifacts
+**/result/runtime/
+**/result/raw/
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

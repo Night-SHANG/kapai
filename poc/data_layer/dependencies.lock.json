@@ -1,0 +1,31 @@
+{
+  "engine": {
+    "name": "Godot",
+    "version": "4.7.1",
+    "status": "stable",
+    "platform": "windows-x86_64"
+  },
+  "dependencies": {
+    "yard": {
+      "repository": "https://github.com/elliotfontaine/yard-godot.git",
+      "tag": "v1.2.0",
+      "commit": "48a518b4bec03c8b5ad446f57a2b669110a1752b",
+      "addon_path": "addons/yard",
+      "license": "MIT"
+    },
+    "datatables": {
+      "repository": "https://github.com/yulrun/godot-data-tables-addon.git",
+      "tag": "v1.0.1",
+      "commit": "f405b187b013e3914b812db201f014ac946335a3",
+      "addon_path": "addons/GodotDataTables",
+      "license": "MIT"
+    },
+    "gdunit4": {
+      "repository": "https://github.com/godot-gdunit-labs/gdUnit4.git",
+      "tag": "v6.2.1",
+      "commit": "08ffc7c65b61b1b2edd545616061a99973c13ce1",
+      "addon_path": "addons/gdUnit4",
+      "license": "MIT"
+    }
+  }
+}

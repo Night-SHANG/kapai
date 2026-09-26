@@ -1,0 +1,11 @@
+; P0-1 Godot DataTables isolated project
+config_version=5
+
+[application]
+config/name="Kapai P0 Data Layer - DataTables"
+
+[editor_plugins]
+enabled=PackedStringArray("res://addons/GodotDataTables/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
