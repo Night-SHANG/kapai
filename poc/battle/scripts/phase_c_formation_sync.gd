@@ -80,7 +80,8 @@ func _init() -> void:
     for penalty in [2, 4, 6, 8, 10, 12]:
         var probe := _simulate("cost_one_play", 515151, SENSITIVITY_RUNS, penalty)
         paid_sensitivity[str(penalty)] = {
-            "formation_response_rate": float(probe.formation_adjustments) / maxf(1.0, float(probe.formation_need_turns)),
+            "formation_adjustment_rate": float(probe.formation_adjustments) / maxf(1.0, float(probe.formation_need_turns)),
+            "formation_resolution_rate": float(probe.formation_resolved) / maxf(1.0, float(probe.formation_need_turns)),
             "avg_cards_played": float(probe.cards_played) / maxf(1.0, float(probe.turns)),
             "natural_sync_total": probe.natural_sync,
         }
@@ -97,10 +98,12 @@ func _init() -> void:
             "sync_triggers": ["mark_consume", "intercept", "link"],
         },
         "free_adjustment": free.to_dict(),
+        "free_adjacent": adjacent.to_dict(),
         "cost_one_play": paid.to_dict(),
         "paid_formation_sensitivity": paid_sensitivity,
         "deterministic_replay": {
             "free_adjustment": true,
+            "free_adjacent": true,
             "cost_one_play": true,
         },
     }
@@ -283,6 +286,23 @@ func _swapped(formation: Array, character: StringName, desired_pos: int) -> Arra
     out[current] = other
     return out
 
+func _step_adjacent(formation: Array, character: StringName, desired_pos: int) -> Array:
+    var out := formation.duplicate()
+    var current := out.find(character)
+    if current == -1 or current == desired_pos:
+        return out
+    var next_pos := current + (1 if desired_pos > current else -1)
+    var other = out[next_pos]
+    out[next_pos] = character
+    out[current] = other
+    return out
+
+func _position_threat_cost(formation: Array, character: StringName, desired_pos: int, hazard_penalty: int) -> int:
+    var current := formation.find(character)
+    if current == -1:
+        return hazard_penalty * 2
+    return absi(current - desired_pos) * hazard_penalty
+
 func _simulate(model: String, seed_override: int = -1, runs_override: int = -1, hazard_penalty: int = HAZARD_PENALTY) -> Result:
     var result := Result.new()
     var total_runs := RUNS if runs_override < 0 else runs_override
@@ -321,18 +341,20 @@ func _simulate(model: String, seed_override: int = -1, runs_override: int = -1, 
             if mismatch:
                 result.formation_need_turns += 1
                 var stay := _best_subset(hand, 3, formation, enemy_target, false)
-                var moved_formation := _swapped(formation, need_character, desired_pos)
-                var move_budget := 3 if model == "free_adjustment" else 2
+                var moved_formation := _step_adjacent(formation, need_character, desired_pos) if model == "free_adjacent" else _swapped(formation, need_character, desired_pos)
+                var move_budget := 2 if model == "cost_one_play" else 3
                 var moved := _best_subset(hand, move_budget, moved_formation, enemy_target, false)
 
-                var stay_score := int(stay["utility"]) - hazard_penalty
-                var move_score := int(moved["utility"])
+                var stay_score := int(stay["utility"]) - _position_threat_cost(formation, need_character, desired_pos, hazard_penalty)
+                var move_score := int(moved["utility"]) - _position_threat_cost(moved_formation, need_character, desired_pos, hazard_penalty)
 
                 if move_score > stay_score:
                     adjusted = true
                     chosen_formation = moved_formation
                     action_budget = move_budget
                     result.formation_adjustments += 1
+                    if _position_of(moved_formation, need_character) == desired_pos:
+                        result.formation_resolved += 1
                     if model == "cost_one_play":
                         result.formation_action_cost_total += 1
 
