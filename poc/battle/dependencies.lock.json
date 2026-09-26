@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "dependencies": [
+    {
+      "id": "card_framework",
+      "repository": "chun92/card-framework",
+      "tag": "v1.4.0",
+      "commit": "a74b713863adb27a22965a8e6ed039d0c4016791",
+      "license": "MIT",
+      "godot_compatibility": "4.6+",
+      "purpose": "presentation-only card Hand/Card layer for P0-3 input/presentation smoke",
+      "authority_boundary": "must not own or mutate BattleState, draw order, action economy, formation rules, or battle undo"
+    }
+  ]
+}

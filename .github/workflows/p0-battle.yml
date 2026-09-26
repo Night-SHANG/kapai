@@ -11,7 +11,7 @@ on:
 
 jobs:
   phase-a:
-    name: Windows Godot 4.7.1 Phase A
+    name: Windows Godot 4.7.1 P0-3
     runs-on: windows-latest
     timeout-minutes: 10
 
@@ -29,15 +29,15 @@ jobs:
           "GODOT_EXE=$binary" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           & $binary --version
 
-      - name: Run Phase A
+      - name: Run P0-3 Battle suite
         shell: pwsh
         run: |
           .\poc\battle\run_p0.ps1 -GodotExe "$env:GODOT_EXE"
 
-      - name: Upload Phase A summary
+      - name: Upload P0-3 summaries
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: p0-3-phase-a
+          name: p0-3-results
           path: poc/battle/result/runtime/
           if-no-files-found: ignore

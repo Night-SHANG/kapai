@@ -70,4 +70,12 @@ Write-Host "[P0-3] PHASE C COMPLETE"
 Write-Host "[P0-3] Running Phase D integrated BattleState/BattleCommand smoke"
 Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/phase_d_core_smoke.gd") -Label "P0-3 Phase D" | Out-Null
 
-Write-Host "[P0-3] PHASE A + B + C + D COMPLETE"
+Write-Host "[P0-3] PHASE D COMPLETE"
+
+Write-Host "[P0-3] Installing pinned Card Framework for Phase E"
+& (Join-Path $Here "install_dependencies.ps1")
+
+Write-Host "[P0-3] Running Phase E input/presentation smoke"
+Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/phase_e_input_presentation_smoke.gd") -Label "P0-3 Phase E" | Out-Null
+
+Write-Host "[P0-3] PHASE A + B + C + D + E COMPLETE"
