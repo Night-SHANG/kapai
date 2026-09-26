@@ -12,7 +12,7 @@ const TURNS_PER_RUN := 12
 const RUNS := 1000
 const BASE_SEED := 991337
 const HAZARD_PENALTY := 6
-const SENSITIVITY_RUNS := 250
+const SENSITIVITY_RUNS := 100
 const POSITION_BONUS := 2
 
 class DeckState:
@@ -79,7 +79,7 @@ func _init() -> void:
     var paid_sensitivity := {}
     for penalty in [2, 4, 6, 8, 10, 12]:
         var probe := _simulate("cost_one_play", 515151, SENSITIVITY_RUNS, penalty)
-        paid_sensitivity[String(penalty)] = {
+        paid_sensitivity[str(penalty)] = {
             "formation_response_rate": float(probe.formation_adjustments) / maxf(1.0, float(probe.formation_need_turns)),
             "avg_cards_played": float(probe.cards_played) / maxf(1.0, float(probe.turns)),
             "natural_sync_total": probe.natural_sync,
