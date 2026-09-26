@@ -1,0 +1,48 @@
+name: P0 Events
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "poc/events/**"
+      - ".github/workflows/p0-events.yml"
+
+jobs:
+  p0-events:
+    name: Windows Godot 4.7.1 P0-5
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Godot 4.7.1 stable
+        shell: pwsh
+        run: |
+          $url = "https://github.com/godotengine/godot-builds/releases/download/4.7.1-stable/Godot_v4.7.1-stable_win64.exe.zip"
+          Invoke-WebRequest -Uri $url -OutFile godot.zip
+          Expand-Archive godot.zip -DestinationPath godot
+          $binary = (Resolve-Path "godot/Godot_v4.7.1-stable_win64.exe").Path
+          "GODOT_EXE=$binary" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          & $binary --version
+
+      - name: Run P0-5 Event suite
+        shell: pwsh
+        run: |
+          .\poc\events\run_p0.ps1 -GodotExe "$env:GODOT_EXE"
+
+      - name: Upload P0-5 result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-5-events-results
+          path: poc/events/result/runtime/
+          if-no-files-found: ignore
