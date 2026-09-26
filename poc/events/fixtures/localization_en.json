@@ -1,0 +1,12 @@
+{
+  "event.sealed_lab.name": "Sealed Laboratory",
+  "event.sealed_lab.option.force": "Force the sealed door",
+  "event.sealed_lab.option.breach": "Use one breach charge",
+  "event.sealed_lab.option.engineering": "Let Engineering bypass the lock",
+  "event.sealed_lab.option.research_auth": "Use archived access authorization",
+  "event.sealed_lab.option.leave": "Leave",
+  "event.lab_alarm.name": "Laboratory Alarm",
+  "event.lab_alarm.option.engage": "Engage the security unit",
+  "event.scavenger_ping.name": "Scavenger Ping",
+  "event.scavenger_ping.option.collect": "Collect the trace material"
+}
