@@ -26,3 +26,6 @@ Thumbs.db
 
 # P0-4 generated GLoot bridge
 poc/inventory/generated/
+
+# P0-5 generated YARD event resources/registry
+poc/events/data/
