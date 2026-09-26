@@ -31,17 +31,18 @@ if (-not (Test-Path $SourceAddon)) {
 New-Item -ItemType Directory -Force -Path (Split-Path $Destination -Parent) | Out-Null
 Copy-Item -Path $SourceAddon -Destination $Destination -Recurse
 
-$license = Join-Path $SourceRoot "LICENSE.md"
-if (-not (Test-Path $license)) {
-    throw "Card Framework MIT license missing from pinned source."
+$licenseDestination = Join-Path $Destination "_UPSTREAM_LICENSE.md"
+$licenseUrl = "https://raw.githubusercontent.com/chun92/card-framework/$Commit/LICENSE.md"
+Invoke-WebRequest -Uri $licenseUrl -OutFile $licenseDestination
+$licenseText = Get-Content $licenseDestination -Raw
+if ($licenseText -notmatch "MIT License") {
+    throw "Pinned Card Framework license verification failed."
 }
-Copy-Item -Path $license -Destination (Join-Path $Destination "_UPSTREAM_LICENSE.md")
 
-$readme = Join-Path $SourceRoot "README.md"
-if (-not (Test-Path $readme)) {
-    throw "Card Framework README missing from pinned source."
-}
-$readmeText = Get-Content $readme -Raw
+$readmeUrl = "https://raw.githubusercontent.com/chun92/card-framework/$Commit/README.md"
+$readmePath = Join-Path $env:TEMP "card-framework-$Commit-README.md"
+Invoke-WebRequest -Uri $readmeUrl -OutFile $readmePath
+$readmeText = Get-Content $readmePath -Raw
 if ($readmeText -notmatch "Godot 4\.6\+") {
     throw "Pinned Card Framework no longer declares Godot 4.6+ compatibility."
 }
