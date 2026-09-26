@@ -23,3 +23,6 @@ poc/data_layer/datatables/data/
 Thumbs.db
 .vscode/
 .idea/
+
+# P0-4 generated GLoot bridge
+poc/inventory/generated/
