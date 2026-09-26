@@ -12,6 +12,7 @@ const TURNS_PER_RUN := 12
 const RUNS := 1000
 const BASE_SEED := 991337
 const HAZARD_PENALTY := 6
+const SENSITIVITY_RUNS := 250
 const POSITION_BONUS := 2
 
 class DeckState:
@@ -65,6 +66,15 @@ func _init() -> void:
         quit(3)
         return
 
+    var paid_sensitivity := {}
+    for penalty in [2, 4, 6, 8, 10, 12]:
+        var probe := _simulate("cost_one_play", 515151, SENSITIVITY_RUNS, penalty)
+        paid_sensitivity[String(penalty)] = {
+            "formation_response_rate": float(probe.formation_adjustments) / maxf(1.0, float(probe.formation_need_turns)),
+            "avg_cards_played": float(probe.cards_played) / maxf(1.0, float(probe.turns)),
+            "natural_sync_total": probe.natural_sync,
+        }
+
     var summary := {
         "fixture": {
             "draw_model": "per_character_quota",
@@ -78,6 +88,7 @@ func _init() -> void:
         },
         "free_adjustment": free.to_dict(),
         "cost_one_play": paid.to_dict(),
+        "paid_formation_sensitivity": paid_sensitivity,
         "deterministic_replay": {
             "free_adjustment": true,
             "cost_one_play": true,
@@ -95,6 +106,7 @@ func _init() -> void:
 
     print("[P0-3:C] FREE | " + JSON.stringify(free.to_dict()))
     print("[P0-3:C] PAID | " + JSON.stringify(paid.to_dict()))
+    print("[P0-3:C] PAID_SENSITIVITY | " + JSON.stringify(paid_sensitivity))
     print("[P0-3:C] DETERMINISM PASS")
     print("[P0-3:C] PASS")
     quit(0)
@@ -260,7 +272,7 @@ func _swapped(formation: Array, character: StringName, desired_pos: int) -> Arra
     out[current] = other
     return out
 
-func _simulate(model: String, seed_override: int = -1, runs_override: int = -1) -> Result:
+func _simulate(model: String, seed_override: int = -1, runs_override: int = -1, hazard_penalty: int = HAZARD_PENALTY) -> Result:
     var result := Result.new()
     var total_runs := RUNS if runs_override < 0 else runs_override
 
@@ -302,7 +314,7 @@ func _simulate(model: String, seed_override: int = -1, runs_override: int = -1) 
                 var move_budget := 3 if model == "free_adjustment" else 2
                 var moved := _best_subset(hand, move_budget, moved_formation, enemy_target, false)
 
-                var stay_score := int(stay["utility"]) - HAZARD_PENALTY
+                var stay_score := int(stay["utility"]) - hazard_penalty
                 var move_score := int(moved["utility"])
 
                 if move_score > stay_score:
