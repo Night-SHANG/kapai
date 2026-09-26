@@ -3,6 +3,7 @@ config_version=5
 
 [application]
 config/name="Kapai P0 Effect Layer - GodotGAS"
+run/main_scene="res://main.tscn"
 
 [autoload]
 GameplayCueManager="*res://addons/GodotGAS/managers/gameplay_cue_manager.gd"

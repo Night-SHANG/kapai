@@ -85,7 +85,7 @@ Write-Host "[P0-2] Importing GodotGAS project"
 Invoke-Godot -Arguments @("--headless","--editor","--path",$Gas,"--import") -Label "GodotGAS import" | Out-Null
 
 Write-Host "[P0-2] Running GodotGAS core semantics"
-Invoke-Godot -Arguments @("--headless","--path",$Gas,"--script","res://scripts/preflight.gd") -Label "GodotGAS core" | Out-Null
+Invoke-Godot -Arguments @("--headless","--path",$Gas) -Label "GodotGAS core" | Out-Null
 
 Write-Host "[P0-2] Importing lightweight project"
 Invoke-Godot -Arguments @("--headless","--editor","--path",$Light,"--import") -Label "Lightweight import" | Out-Null
