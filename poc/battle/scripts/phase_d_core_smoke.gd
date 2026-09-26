@@ -572,8 +572,9 @@ func _intent_snapshot(intent: Dictionary) -> Dictionary:
 func _rng_isolation_probe(seed: int) -> Dictionary:
     var state := _new_state(seed)
     var falcon_hand: Array = state["hands"][&"char_falcon"]
-    var ai_before := (state["ai_rng"] as RandomNumberGenerator).state
-    var draw_before := (state["draw_rng"] as RandomNumberGenerator).state
+
+    var ai_before_redraw := (state["ai_rng"] as RandomNumberGenerator).state
+    var draw_before_redraw := (state["draw_rng"] as RandomNumberGenerator).state
 
     var redraw_result := _apply_command(state, {
         "type": "redraw",
@@ -583,16 +584,36 @@ func _rng_isolation_probe(seed: int) -> Dictionary:
         return {"pass": false, "stage": "redraw"}
 
     var ai_after_redraw := (state["ai_rng"] as RandomNumberGenerator).state
-    if ai_after_redraw != ai_before:
+    var draw_after_redraw := (state["draw_rng"] as RandomNumberGenerator).state
+    if ai_after_redraw != ai_before_redraw:
         return {"pass": false, "stage": "redraw_changed_ai"}
 
-    var draw_after_redraw := (state["draw_rng"] as RandomNumberGenerator).state
+    # Drawing from an already shuffled pile is deterministic and does not need to
+    # advance the draw RNG. Prove the streams with an explicit shuffle instead.
+    var scratch := [0, 1, 2, 3, 4]
+    var ai_before_shuffle := ai_after_redraw
+    var draw_before_shuffle := draw_after_redraw
+    _shuffle(scratch, state["draw_rng"])
+    var ai_after_shuffle := (state["ai_rng"] as RandomNumberGenerator).state
+    var draw_after_shuffle := (state["draw_rng"] as RandomNumberGenerator).state
+
+    if draw_after_shuffle == draw_before_shuffle:
+        return {"pass": false, "stage": "shuffle_did_not_advance_draw"}
+    if ai_after_shuffle != ai_before_shuffle:
+        return {"pass": false, "stage": "shuffle_changed_ai"}
+
+    var draw_before_intent := draw_after_shuffle
+    var ai_before_intent := ai_after_shuffle
     _roll_intent(state)
     var draw_after_intent := (state["draw_rng"] as RandomNumberGenerator).state
+    var ai_after_intent := (state["ai_rng"] as RandomNumberGenerator).state
 
     return {
-        "pass": draw_after_redraw == draw_after_intent and draw_after_redraw != draw_before,
-        "redraw_changed_draw": draw_after_redraw != draw_before,
-        "redraw_changed_ai": ai_after_redraw != ai_before,
-        "intent_changed_draw": draw_after_intent != draw_after_redraw,
+        "pass": draw_after_intent == draw_before_intent and ai_after_intent != ai_before_intent,
+        "redraw_changed_draw": draw_after_redraw != draw_before_redraw,
+        "redraw_changed_ai": ai_after_redraw != ai_before_redraw,
+        "shuffle_changed_draw": draw_after_shuffle != draw_before_shuffle,
+        "shuffle_changed_ai": ai_after_shuffle != ai_before_shuffle,
+        "intent_changed_draw": draw_after_intent != draw_before_intent,
+        "intent_changed_ai": ai_after_intent != ai_before_intent,
     }
