@@ -75,6 +75,9 @@ Write-Host "[P0-3] PHASE D COMPLETE"
 Write-Host "[P0-3] Installing pinned Card Framework for Phase E"
 & (Join-Path $Here "install_dependencies.ps1")
 
+Write-Host "[P0-3] Warming Godot import/global script class cache for Phase E"
+Invoke-Godot -Arguments @("--headless","--path",$Here,"--import") -Label "P0-3 Phase E import warmup" -TimeoutSeconds 30 | Out-Null
+
 Write-Host "[P0-3] Running Phase E input/presentation smoke"
 Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/phase_e_input_presentation_smoke.gd") -Label "P0-3 Phase E" | Out-Null
 

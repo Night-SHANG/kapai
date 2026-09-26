@@ -1,9 +1,8 @@
-class_name CardFrameworkPresenter
 extends RefCounted
 
 const CARD_SCENE_PATH := "res://addons/card-framework/card.tscn"
 
-func render_hand(hand: P0PresentationHand, card_ids: Array[String]) -> Dictionary:
+func render_hand(hand, card_ids: Array[String]) -> Dictionary:
     var before_count := hand.get_card_count()
     if before_count > 0:
         hand.clear_cards()
@@ -13,7 +12,7 @@ func render_hand(hand: P0PresentationHand, card_ids: Array[String]) -> Dictionar
         return {"ok": false, "error": "Could not load Card Framework card.tscn"}
 
     for card_id in card_ids:
-        var card := card_scene.instantiate() as Card
+        var card = card_scene.instantiate()
         if card == null:
             return {"ok": false, "error": "Card Framework card scene did not instantiate Card"}
         card.card_name = card_id
@@ -24,7 +23,7 @@ func render_hand(hand: P0PresentationHand, card_ids: Array[String]) -> Dictionar
     var rendered_ids: Array[String] = []
     var framework_interaction_disabled := true
     for raw in hand._held_cards:
-        var card := raw as Card
+        var card = raw
         rendered_ids.append(card.card_name)
         if card.can_be_interacted_with:
             framework_interaction_disabled = false

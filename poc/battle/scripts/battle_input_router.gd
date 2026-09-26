@@ -1,4 +1,3 @@
-class_name BattleInputRouter
 extends RefCounted
 
 var selected_index: int = 0
