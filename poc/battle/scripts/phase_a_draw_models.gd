@@ -32,7 +32,9 @@ class ModelResult:
             "turns": turns,
             "exact_2_2_2_rate": float(exact_222) / maxf(1.0, float(turns)),
             "character_absence_events": character_absence,
+            "character_absence_event_rate_per_turn": float(character_absence) / maxf(1.0, float(turns)),
             "concentration_3plus_turns": concentration_3plus,
+            "concentration_3plus_rate": float(concentration_3plus) / maxf(1.0, float(turns)),
             "avg_role_count_imbalance": float(imbalance_sum) / maxf(1.0, float(turns)),
             "guarantee_searches": guarantee_searches,
             "guarantee_cards_skipped": guarantee_cards_skipped,
@@ -75,6 +77,10 @@ func _init() -> void:
             "per_character_quota": true,
             "shared_fair_pool": true,
         },
+        "phase_a_observation": {
+            "shared_fair_pool_absence_is_candidate_result": true,
+            "winner_for_phase_b": "per_character_quota",
+        },
     }
 
     DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://result/runtime"))
@@ -99,10 +105,13 @@ func _init() -> void:
         quit(6)
         return
     if a2.character_absence != 0:
-        push_error("Shared fair pool guarantee failed to prevent character absence")
+        print("[P0-3:A] OBSERVATION | shared fair pool still produced character absence after redraw/search")
+    if a2.guarantee_searches <= 0 or a2.redraw_searches <= 0:
+        push_error("Shared fair pool did not exercise its fairness-search rules")
         quit(7)
         return
 
+    print("[P0-3:A] WINNER_FOR_PHASE_B | per_character_quota")
     print("[P0-3:A] PASS")
     quit(0)
 
