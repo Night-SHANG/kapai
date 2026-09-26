@@ -1,0 +1,8 @@
+; P0-2 lightweight isolated project
+config_version=5
+
+[application]
+config/name="Kapai P0 Effect Layer - Lightweight"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"

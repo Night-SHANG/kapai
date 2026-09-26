@@ -1,0 +1,11 @@
+; P0-2 GodotGAS isolated runtime project
+config_version=5
+
+[application]
+config/name="Kapai P0 Effect Layer - GodotGAS"
+
+[autoload]
+GameplayCueManager="*res://addons/GodotGAS/managers/gameplay_cue_manager.gd"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"

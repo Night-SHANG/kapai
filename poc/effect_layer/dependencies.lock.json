@@ -1,0 +1,18 @@
+{
+  "engine": {
+    "name": "Godot",
+    "version": "4.7.1",
+    "status": "stable",
+    "platform": "windows-x86_64"
+  },
+  "dependencies": {
+    "godot_gas": {
+      "repository": "https://github.com/yulrun/godot-gas.git",
+      "tag": "v1.1.0",
+      "commit": "42ae230840bfbe4d62629e6f5d1d5ba1a65a4a3b",
+      "addon_source": "GodotGAS",
+      "addon_destination": "addons/GodotGAS",
+      "license": "MIT"
+    }
+  }
+}
