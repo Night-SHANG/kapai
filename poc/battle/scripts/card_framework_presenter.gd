@@ -18,14 +18,22 @@ func render_hand(hand, card_ids: Array[String]) -> Dictionary:
         card.card_name = card_id
         hand.add_card(card)
 
+    # Let the framework perform its normal layout once, then explicitly switch
+    # every rendered card into presentation-only mode. Hand._update_card_states()
+    # enables interaction by default, so this adapter must turn it back off.
     hand.update_card_ui()
 
     var rendered_ids: Array[String] = []
     var framework_interaction_disabled := true
     for raw in hand._held_cards:
         var card = raw
+        card.show_front = true
+        card.can_be_interacted_with = false
+        card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        card.set_process(false)
+
         rendered_ids.append(card.card_name)
-        if card.can_be_interacted_with:
+        if card.can_be_interacted_with or card.mouse_filter != Control.MOUSE_FILTER_IGNORE:
             framework_interaction_disabled = false
 
     return {

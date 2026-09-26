@@ -41,6 +41,7 @@ func _run() -> void:
         return
 
     var manager := manager_scene.instantiate()
+    manager.debug_mode = false
     scene.add_child(manager)
 
     var hand_script = load("res://addons/card-framework/hand.gd")
@@ -52,7 +53,14 @@ func _run() -> void:
     hand.name = "PresentationHand"
     hand.position = Vector2(640, 500)
     hand.max_hand_spread = 720
-    scene.add_child(hand)
+
+    # Phase E deliberately disables the framework drag/drop layer. Hand's layout
+    # code normally assumes a DropZone when align_drop_zone_size... is enabled,
+    # so both flags must be disabled together.
+    hand.enable_drop_zone = false
+    hand.align_drop_zone_size_with_current_hand_size = false
+    hand.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    manager.add_child(hand)
 
     await process_frame
 
@@ -65,8 +73,11 @@ func _run() -> void:
         _fail("Card Framework presenter script failed to load", 5)
         return
     var presenter = presenter_script.new()
-    var presentation = presenter.render_hand(hand, HAND_IDS)
+    var presentation: Dictionary = presenter.render_hand(hand, HAND_IDS)
     await process_frame
+
+    # No further framework input/process loop is needed in this headless smoke.
+    hand.set_process(false)
 
     if not bool(presentation.get("ok", false)):
         _fail("Presenter failed: %s" % JSON.stringify(presentation), 6)

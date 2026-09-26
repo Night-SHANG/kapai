@@ -79,6 +79,6 @@ Write-Host "[P0-3] Warming Godot import/global script class cache for Phase E"
 Invoke-Godot -Arguments @("--headless","--path",$Here,"--import") -Label "P0-3 Phase E import warmup" -TimeoutSeconds 30 | Out-Null
 
 Write-Host "[P0-3] Running Phase E input/presentation smoke"
-Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/phase_e_input_presentation_smoke.gd") -Label "P0-3 Phase E" | Out-Null
+Invoke-Godot -Arguments @("--headless","--path",$Here,"--quit-after","300","--script","res://scripts/phase_e_input_presentation_smoke.gd") -Label "P0-3 Phase E" -TimeoutSeconds 15 | Out-Null
 
 Write-Host "[P0-3] PHASE A + B + C + D + E COMPLETE"
