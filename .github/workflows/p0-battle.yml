@@ -1,0 +1,43 @@
+name: P0 Battle
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "poc/battle/**"
+      - ".github/workflows/p0-battle.yml"
+
+jobs:
+  phase-a:
+    name: Windows Godot 4.7.1 Phase A
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Godot 4.7.1 stable
+        shell: pwsh
+        run: |
+          $url = "https://github.com/godotengine/godot-builds/releases/download/4.7.1-stable/Godot_v4.7.1-stable_win64.exe.zip"
+          Invoke-WebRequest -Uri $url -OutFile godot.zip
+          Expand-Archive godot.zip -DestinationPath godot
+          $binary = (Resolve-Path "godot/Godot_v4.7.1-stable_win64.exe").Path
+          "GODOT_EXE=$binary" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          & $binary --version
+
+      - name: Run Phase A
+        shell: pwsh
+        run: |
+          .\poc\battle\run_p0.ps1 -GodotExe "$env:GODOT_EXE"
+
+      - name: Upload Phase A summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-3-phase-a
+          path: poc/battle/result/runtime/
+          if-no-files-found: ignore

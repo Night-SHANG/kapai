@@ -1,0 +1,7 @@
+config_version=5
+
+[application]
+config/name="Kapai P0-3 Battle Draw Models"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
