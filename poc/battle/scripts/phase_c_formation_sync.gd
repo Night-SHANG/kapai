@@ -23,6 +23,7 @@ class Result:
     var turns := 0
     var formation_need_turns := 0
     var formation_adjustments := 0
+    var formation_resolved := 0
     var formation_action_cost_total := 0
     var cards_played := 0
     var natural_sync := 0
@@ -37,7 +38,8 @@ class Result:
             "turns": turns,
             "formation_need_turns": formation_need_turns,
             "formation_adjustments": formation_adjustments,
-            "formation_response_rate": float(formation_adjustments) / maxf(1.0, float(formation_need_turns)),
+            "formation_resolved": formation_resolved,
+            "formation_response_rate": float(formation_resolved) / maxf(1.0, float(formation_need_turns)),
             "formation_action_cost_total": formation_action_cost_total,
             "avg_cards_played": float(cards_played) / maxf(1.0, float(turns)),
             "natural_sync_total": natural_sync,
@@ -50,6 +52,7 @@ class Result:
 
 func _init() -> void:
     var free := _simulate("free_adjustment")
+    var adjacent := _simulate("free_adjacent")
     var paid := _simulate("cost_one_play")
 
     var replay_free_a := _simulate("free_adjustment", 424242, 1)
@@ -59,11 +62,18 @@ func _init() -> void:
         quit(2)
         return
 
+    var replay_adjacent_a := _simulate("free_adjacent", 424242, 1)
+    var replay_adjacent_b := _simulate("free_adjacent", 424242, 1)
+    if JSON.stringify(replay_adjacent_a.trace) != JSON.stringify(replay_adjacent_b.trace):
+        push_error("Free adjacent formation deterministic replay failed")
+        quit(3)
+        return
+
     var replay_paid_a := _simulate("cost_one_play", 424242, 1)
     var replay_paid_b := _simulate("cost_one_play", 424242, 1)
     if JSON.stringify(replay_paid_a.trace) != JSON.stringify(replay_paid_b.trace):
         push_error("Paid formation deterministic replay failed")
-        quit(3)
+        quit(5)
         return
 
     var paid_sensitivity := {}
@@ -104,7 +114,8 @@ func _init() -> void:
     f.store_string(JSON.stringify(summary, "  "))
     f.close()
 
-    print("[P0-3:C] FREE | " + JSON.stringify(free.to_dict()))
+    print("[P0-3:C] FREE_ANY | " + JSON.stringify(free.to_dict()))
+    print("[P0-3:C] FREE_ADJACENT | " + JSON.stringify(adjacent.to_dict()))
     print("[P0-3:C] PAID | " + JSON.stringify(paid.to_dict()))
     print("[P0-3:C] PAID_SENSITIVITY | " + JSON.stringify(paid_sensitivity))
     print("[P0-3:C] DETERMINISM PASS")
