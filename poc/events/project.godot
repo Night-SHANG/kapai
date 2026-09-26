@@ -1,0 +1,14 @@
+; P0-5 isolated world-event pipeline project
+config_version=5
+
+[application]
+config/name="Kapai P0 Events"
+
+[autoload]
+DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
+
+[editor_plugins]
+enabled=PackedStringArray("res://addons/yard/plugin.cfg", "res://addons/dialogue_manager/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
