@@ -5,9 +5,38 @@ $Here = $PSScriptRoot
 if ([string]::IsNullOrWhiteSpace($GodotExe)) { throw "Pass -GodotExe or set GODOT_EXE." }
 if (-not (Test-Path $GodotExe)) { throw "Godot executable not found: $GodotExe" }
 
-$Version = (& $GodotExe --version).Trim()
+# Godot may emit --version through a native stream that PowerShell does not
+# reliably capture with the simple (& exe --version) expression on all runners.
+$psi = [System.Diagnostics.ProcessStartInfo]::new()
+$psi.FileName = $GodotExe
+$psi.Arguments = "--version"
+$psi.UseShellExecute = $false
+$psi.RedirectStandardOutput = $true
+$psi.RedirectStandardError = $true
+
+$process = [System.Diagnostics.Process]::new()
+$process.StartInfo = $psi
+if (-not $process.Start()) { throw "Failed to launch Godot for version check." }
+
+$stdout = $process.StandardOutput.ReadToEnd()
+$stderr = $process.StandardError.ReadToEnd()
+$process.WaitForExit()
+
+if ($process.ExitCode -ne 0) {
+    throw "Godot --version failed with exit code $($process.ExitCode). stderr: $stderr"
+}
+
+$VersionText = ($stdout + [Environment]::NewLine + $stderr).Trim()
+$Version = ($VersionText -split "\r?\n" | Where-Object { $_ -match "^4\.7\.1\.stable" } | Select-Object -First 1)
+
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    throw "Could not detect Godot 4.7.1 stable from version output: $VersionText"
+}
+
 Write-Host "[P0] Godot: $Version"
-if (-not $Version.StartsWith("4.7.1.stable")) { throw "Wrong Godot version. Required 4.7.1 stable, got: $Version" }
+if (-not $Version.StartsWith("4.7.1.stable")) {
+    throw "Wrong Godot version. Required 4.7.1 stable, got: $Version"
+}
 
 $Python = $null
 if (Get-Command py -ErrorAction SilentlyContinue) { $Python = "py" }
