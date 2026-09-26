@@ -1,0 +1,299 @@
+[
+  {
+    "id": "event_test_sealed_lab",
+    "name_key": "event.sealed_lab.name",
+    "critical": true,
+    "event_tags": [
+      "location",
+      "story_probe"
+    ],
+    "region_filters": [
+      "region_test"
+    ],
+    "location_filters": [
+      "location_test_sealed_lab"
+    ],
+    "availability_conditions": [
+      {
+        "type": "EventNotSeen",
+        "args": {
+          "event_id": "event_test_sealed_lab"
+        }
+      }
+    ],
+    "repeat_policy": "once",
+    "cooldown_cycles": 0,
+    "dialogue_resource": "res://dialogue/sealed_lab.dialogue",
+    "dialogue_intro": "intro",
+    "priority": 100,
+    "options": [
+      {
+        "option_id": "option_force",
+        "text_key": "event.sealed_lab.option.force",
+        "dialogue_branch": "option_force",
+        "conditions": [],
+        "preview_policy": "full",
+        "completes_event": true,
+        "commands": [
+          {
+            "type": "ChangeThreat",
+            "args": {
+              "amount": 15
+            }
+          },
+          {
+            "type": "SetLocationState",
+            "args": {
+              "location_id": "location_test_sealed_lab",
+              "key": "lab_opened",
+              "value": true
+            }
+          }
+        ]
+      },
+      {
+        "option_id": "option_breach",
+        "text_key": "event.sealed_lab.option.breach",
+        "dialogue_branch": "option_breach",
+        "conditions": [
+          {
+            "type": "HasItem",
+            "args": {
+              "item_id": "item_breach_charge_test"
+            }
+          }
+        ],
+        "preview_policy": "full",
+        "completes_event": true,
+        "commands": [
+          {
+            "type": "RemoveItem",
+            "args": {
+              "item_id": "item_breach_charge_test",
+              "count": 1
+            }
+          },
+          {
+            "type": "ChangeThreat",
+            "args": {
+              "amount": 8
+            }
+          },
+          {
+            "type": "SetLocationState",
+            "args": {
+              "location_id": "location_test_sealed_lab",
+              "key": "lab_opened",
+              "value": true
+            }
+          }
+        ]
+      },
+      {
+        "option_id": "option_engineering",
+        "text_key": "event.sealed_lab.option.engineering",
+        "dialogue_branch": "option_engineering",
+        "conditions": [
+          {
+            "type": "PartyHasTag",
+            "args": {
+              "tag": "Engineering"
+            }
+          }
+        ],
+        "preview_policy": "full",
+        "completes_event": true,
+        "commands": [
+          {
+            "type": "ChangeThreat",
+            "args": {
+              "amount": 2
+            }
+          },
+          {
+            "type": "SetLocationState",
+            "args": {
+              "location_id": "location_test_sealed_lab",
+              "key": "lab_opened",
+              "value": true
+            }
+          },
+          {
+            "type": "AddResource",
+            "args": {
+              "resource_id": "data",
+              "amount": 1
+            }
+          }
+        ]
+      },
+      {
+        "option_id": "option_research_auth",
+        "text_key": "event.sealed_lab.option.research_auth",
+        "dialogue_branch": "option_research_auth",
+        "conditions": [
+          {
+            "type": "HasResearch",
+            "args": {
+              "research_id": "research_old_access_protocol"
+            }
+          }
+        ],
+        "preview_policy": "full",
+        "completes_event": true,
+        "commands": [
+          {
+            "type": "SetLocationState",
+            "args": {
+              "location_id": "location_test_sealed_lab",
+              "key": "lab_opened",
+              "value": true
+            }
+          },
+          {
+            "type": "UnlockArchive",
+            "args": {
+              "archive_id": "archive_lab_access"
+            }
+          }
+        ]
+      },
+      {
+        "option_id": "option_leave",
+        "text_key": "event.sealed_lab.option.leave",
+        "dialogue_branch": "option_leave",
+        "conditions": [],
+        "preview_policy": "full",
+        "completes_event": false,
+        "commands": []
+      }
+    ]
+  },
+  {
+    "id": "event_test_lab_alarm",
+    "name_key": "event.lab_alarm.name",
+    "critical": false,
+    "event_tags": [
+      "battle_bridge"
+    ],
+    "region_filters": [
+      "region_test"
+    ],
+    "location_filters": [
+      "location_test_sealed_lab"
+    ],
+    "availability_conditions": [
+      {
+        "type": "LocationState",
+        "args": {
+          "location_id": "location_test_sealed_lab",
+          "key": "lab_opened",
+          "value": true
+        }
+      },
+      {
+        "type": "EventNotSeen",
+        "args": {
+          "event_id": "event_test_lab_alarm"
+        }
+      }
+    ],
+    "repeat_policy": "once",
+    "cooldown_cycles": 0,
+    "dialogue_resource": "res://dialogue/lab_alarm.dialogue",
+    "dialogue_intro": "intro",
+    "priority": 80,
+    "options": [
+      {
+        "option_id": "option_engage",
+        "text_key": "event.lab_alarm.option.engage",
+        "dialogue_branch": "option_engage",
+        "conditions": [],
+        "preview_policy": "partial",
+        "completes_event": true,
+        "commands": [
+          {
+            "type": "StartBattle",
+            "args": {
+              "encounter_id": "encounter_test_lab_guard"
+            }
+          }
+        ],
+        "continuations": {
+          "win": [
+            {
+              "type": "AddResource",
+              "args": {
+                "resource_id": "data",
+                "amount": 2
+              }
+            },
+            {
+              "type": "SetWorldFlag",
+              "args": {
+                "flag": "lab_guard_defeated",
+                "value": true
+              }
+            }
+          ],
+          "retreat": [
+            {
+              "type": "ChangeThreat",
+              "args": {
+                "amount": 5
+              }
+            }
+          ],
+          "wipe": [
+            {
+              "type": "SetWorldFlag",
+              "args": {
+                "flag": "expedition_wiped",
+                "value": true
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "event_test_scavenger_ping",
+    "name_key": "event.scavenger_ping.name",
+    "critical": false,
+    "event_tags": [
+      "repeat_probe"
+    ],
+    "region_filters": [
+      "region_test"
+    ],
+    "location_filters": [
+      "location_test_sealed_lab"
+    ],
+    "availability_conditions": [],
+    "repeat_policy": "cooldown",
+    "cooldown_cycles": 2,
+    "dialogue_resource": "res://dialogue/scavenger_ping.dialogue",
+    "dialogue_intro": "intro",
+    "priority": 10,
+    "options": [
+      {
+        "option_id": "option_collect",
+        "text_key": "event.scavenger_ping.option.collect",
+        "dialogue_branch": "option_collect",
+        "conditions": [],
+        "preview_policy": "full",
+        "completes_event": true,
+        "commands": [
+          {
+            "type": "AddResource",
+            "args": {
+              "resource_id": "scrap",
+              "amount": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

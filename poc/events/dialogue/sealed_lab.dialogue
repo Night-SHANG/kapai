@@ -1,0 +1,23 @@
+~ intro
+System: The laboratory door is still sealed.
+=> END
+
+~ option_force
+System: Force the sealed door.
+=> END
+
+~ option_breach
+System: Use one breach charge.
+=> END
+
+~ option_engineering
+System: Let Engineering bypass the lock.
+=> END
+
+~ option_research_auth
+System: Use archived access authorization.
+=> END
+
+~ option_leave
+System: Leave.
+=> END
