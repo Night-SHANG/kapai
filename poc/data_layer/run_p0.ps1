@@ -53,11 +53,7 @@ function Invoke-Godot {
 
 $VersionText = Invoke-Godot -Arguments @("--version") -Label "Godot version check"
 $Version = ($VersionText -split "\r?\n" | Where-Object { $_ -match "^4\.7\.1\.stable" } | Select-Object -First 1)
-
-if ([string]::IsNullOrWhiteSpace($Version)) {
-    throw "Could not detect Godot 4.7.1 stable from version output: $VersionText"
-}
-
+if ([string]::IsNullOrWhiteSpace($Version)) { throw "Could not detect Godot 4.7.1 stable from version output: $VersionText" }
 Write-Host "[P0] Godot: $Version"
 
 $Python = $null
@@ -81,13 +77,13 @@ Write-Host "[P0] Importing YARD project"
 Invoke-Godot -Arguments @("--headless","--editor","--path",$Yard,"--import") -Label "YARD editor import" | Out-Null
 
 Write-Host "[P0] Building YARD resource files"
-Invoke-Godot -Arguments @("--headless","--editor","--path",$Yard,"--script","res://scripts/build_resources.gd") -Label "YARD resource build" | Out-Null
+Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/build_resources.gd") -Label "YARD resource build" | Out-Null
 
 Write-Host "[P0] Re-importing YARD project after resource generation"
 Invoke-Godot -Arguments @("--headless","--editor","--path",$Yard,"--import") -Label "YARD UID scan" | Out-Null
 
-Write-Host "[P0] Building YARD registry"
-Invoke-Godot -Arguments @("--headless","--editor","--path",$Yard,"--script","res://scripts/build_registry.gd") -Label "YARD registry build" | Out-Null
+Write-Host "[P0] Building YARD registry without editor-only YARD internals"
+Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/build_registry.gd") -Label "YARD registry build" | Out-Null
 
 Write-Host "[P0] Running YARD preflight"
 Invoke-Godot -Arguments @("--headless","--path",$Yard,"--script","res://scripts/preflight.gd") -Label "YARD preflight" | Out-Null
