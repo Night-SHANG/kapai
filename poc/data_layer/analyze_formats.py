@@ -72,39 +72,44 @@ def merge_experiment_yard() -> dict:
         }
 
 
-def find_row_block(text: str, row_id: str) -> tuple[int, int]:
-    # Godot text Resource stores dictionary entries containing row subresources.
-    # We search the serialized row id key then expand to the nearest sub-resource block reference.
-    idx = text.find(f'&"{row_id}"')
-    if idx == -1:
-        idx = text.find(f'"{row_id}"')
-    if idx == -1:
-        raise RuntimeError(f"Row id not found: {row_id}")
-    return idx, idx
+def datatable_row_subresource_id(text: str, row_id: str) -> str:
+    # Only inspect the actual serialized rows dictionary. The same stable ID also
+    # occurs earlier in row_order, which must not be mistaken for the row mapping.
+    rows_pos = text.find("\nrows = {")
+    if rows_pos == -1:
+        rows_pos = text.find("rows = {")
+    if rows_pos == -1:
+        raise RuntimeError("DataTable serialized rows dictionary not found")
+
+    rows_text = text[rows_pos:]
+    escaped = re.escape(row_id)
+    patterns = [
+        rf'&"{escaped}"\s*:\s*SubResource\("([^"]+)"\)',
+        rf'"{escaped}"\s*:\s*SubResource\("([^"]+)"\)',
+        rf'StringName\("{escaped}"\)\s*:\s*SubResource\("([^"]+)"\)',
+    ]
+    for pattern in patterns:
+        m = re.search(pattern, rows_text)
+        if m:
+            return m.group(1)
+
+    # Include a small diagnostic excerpt around the rows dictionary in failures.
+    excerpt = rows_text[:1800]
+    raise RuntimeError(f"Could not locate rows mapping for {row_id}. Excerpt:\n{excerpt}")
 
 
 def edit_datatable_row(path: Path, row_id: str) -> None:
     text = path.read_text(encoding="utf-8")
-    idx, _ = find_row_block(text, row_id)
+    sub_id = datatable_row_subresource_id(text, row_id)
 
-    # Identify the SubResource id referenced by this dictionary row.
-    window = text[idx: idx + 300]
-    m = re.search(r'SubResource\("([^"]+)"\)', window)
-    if not m:
-        # Some serializer layouts place value before key; search backward too.
-        window = text[max(0, idx - 300): idx + 300]
-        m = re.search(r'SubResource\("([^"]+)"\)', window)
-    if not m:
-        raise RuntimeError(f"Could not locate subresource for {row_id}")
+    header_pattern = rf'^\[sub_resource[^\]]*id="{re.escape(sub_id)}"[^\]]*\]$'
+    header_match = re.search(header_pattern, text, flags=re.MULTILINE)
+    if not header_match:
+        raise RuntimeError(f"Subresource header not found for {row_id}: {sub_id}")
 
-    sub_id = m.group(1)
-    header = f'[sub_resource type="Resource" id="{sub_id}"]'
-    start = text.find(header)
-    if start == -1:
-        raise RuntimeError(f"Subresource header not found: {sub_id}")
-    end = text.find("\n[", start + len(header))
-    if end == -1:
-        end = len(text)
+    start = header_match.start()
+    next_section = re.search(r"^\[", text[header_match.end():], flags=re.MULTILINE)
+    end = header_match.end() + next_section.start() if next_section else len(text)
 
     block = text[start:end]
     block2 = replace_first_number(block, "base_value")
@@ -134,6 +139,8 @@ def merge_experiment_datatable() -> dict:
             "conflict": merge.returncode != 0,
             "changed_files_branch_a": 1,
             "changed_files_branch_b": 1,
+            "merge_stdout": merge.stdout.strip(),
+            "merge_stderr": merge.stderr.strip(),
         }
 
 
@@ -149,21 +156,20 @@ def diff_stats_yard() -> dict:
 
 
 def diff_stats_datatable() -> dict:
+    lines = line_count(DATATABLE)
     return {
         "entity_files": 1,
-        "total_lines": line_count(DATATABLE),
-        "avg_lines_per_entity": round(line_count(DATATABLE) / 100.0, 2),
+        "total_lines": lines,
+        "avg_lines_per_entity": round(lines / 100.0, 2),
         "single_entity_touch_files": 1,
     }
 
 
 def batch_balance_cost() -> dict:
-    # A structural metric: how many tracked content files must be edited
-    # for a 30-card balance pass.
     return {
         "yard_files_touched_for_30_cards": 30,
         "datatables_files_touched_for_30_cards": 1,
-        "note": "DataTables wins bulk single-table edits; YARD wins isolation and merge locality."
+        "note": "DataTables wins bulk single-table edits; YARD wins isolation and merge locality.",
     }
 
 
@@ -179,11 +185,11 @@ def main():
         },
         "batch_balance": batch_balance_cost(),
     }
+
     out = OUT / "format_analysis.json"
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
-    # Different-entity edits are expected to merge cleanly for YARD.
     if result["yard"]["merge_different_entities"]["conflict"]:
         raise SystemExit("YARD unexpectedly conflicted on different entity files")
 
