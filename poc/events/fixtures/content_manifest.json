@@ -1,0 +1,61 @@
+{
+  "regions": [
+    "region_test"
+  ],
+  "characters": [
+    "char_bastion",
+    "char_falcon",
+    "char_loom"
+  ],
+  "party_tags": [
+    "Heavy",
+    "Military",
+    "Recon",
+    "Sensor",
+    "Engineering",
+    "Archive"
+  ],
+  "items": [
+    "item_scrap_test",
+    "item_data_fragment_test",
+    "item_core_fragment_test",
+    "item_breach_charge_test",
+    "item_hack_kit_test",
+    "item_repair_kit_test",
+    "item_scanner_test",
+    "item_emergency_beacon_test",
+    "item_portable_power_test",
+    "item_key_archive_test"
+  ],
+  "research": [
+    "research_old_access_protocol"
+  ],
+  "locations": [
+    "location_test_sealed_lab"
+  ],
+  "resources": [
+    "scrap",
+    "data",
+    "core"
+  ],
+  "routes": [
+    "route_lab_exit"
+  ],
+  "facilities": [
+    "facility_lab_relay"
+  ],
+  "encounters": [
+    "encounter_test_lab_guard"
+  ],
+  "archives": [
+    "archive_lab_access"
+  ],
+  "world_flags": [
+    "lab_guard_defeated",
+    "expedition_wiped"
+  ],
+  "initial_world_flags": {
+    "lab_guard_defeated": false,
+    "expedition_wiped": false
+  }
+}
