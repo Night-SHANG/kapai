@@ -39,3 +39,11 @@ jobs:
         shell: pwsh
         run: |
           .\poc\data_layer\run_p0.ps1 -GodotExe "$env:GODOT_EXE"
+
+      - name: Upload P0-1 runtime analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-1-data-layer-runtime
+          path: poc/data_layer/result/runtime/
+          if-no-files-found: ignore

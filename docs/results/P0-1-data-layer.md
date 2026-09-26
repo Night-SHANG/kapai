@@ -1,6 +1,6 @@
 # P0-1 Data Layer Result
 
-Status: NOT RUN
+Status: CI BOOTSTRAP VERIFIED / FINAL DECISION PENDING
 
 ## Environment
 
@@ -11,52 +11,66 @@ Status: NOT RUN
 
 ## Automated bootstrap
 
-- [ ] Exact engine version check
-- [ ] Deterministic fixture generation
-- [ ] YARD plugin install
-- [ ] DataTables plugin install
-- [ ] YARD 100 independent card resources
-- [ ] YARD stable registry
-- [ ] YARD headless preflight
-- [ ] DataTables 100-row table
-- [ ] DataTables headless preflight
+Run #5: GitHub Actions 36250009868 — SUCCESS
+
+- [x] Exact engine version check
+- [x] Deterministic fixture generation
+- [x] YARD plugin install
+- [x] DataTables plugin install
+- [x] YARD 100 independent card resources
+- [x] YARD stable registry
+- [x] YARD headless preflight
+- [x] DataTables 100-row table
+- [x] DataTables headless preflight
+
+## Important observations
+
+### YARD
+- Runtime Registry works on Godot 4.7.1.
+- 100 independent CardDefinition resources load through stable string IDs.
+- Headless automation must not depend on YARD editor-only RegistryIO because its icon/editor initialization can crash headless Godot 4.7.1.
+- Script-generated resources require explicit persisted Resource UIDs.
+
+### DataTables
+- 100-row table saves and reloads successfully on Godot 4.7.1.
+- row_order and stable StringName keys survive reload.
+- Current v1.0.1 observation: DataStructure.row_id becomes empty after save/reload.
+- This matches source audit: row_id is injected by add_row()/duplicate_row(), but row_id itself is not exported and DataTable has no visible reload rehydration pass.
 
 ## Experiments
 
 ### Stable ID / file moves
-TBD
+In progress.
 
 ### Git diff / merge
-TBD
+Automated format experiment added after Run #5. Pending CI result.
 
 ### Codex single-entity edit
-TBD
+Pending.
 
 ### Codex batch creation
-TBD
+Pending.
 
 ### Schema v1 -> v2 -> v3
-TBD
+Pending.
 
 ### Batch balance
-TBD
+Structural comparison automated after Run #5; final judgment pending.
 
 ### CSV/JSON round-trip
-TBD
+Pending.
 
 ### Runtime lookup/query
-TBD
+Bootstrap passed for both candidates.
 
 ### Editor UX
-TBD
+Pending local/editor validation.
 
 ### Plugin lock-in / migration-out
-TBD
-
-## Important observations
-
-TBD
+Pending final analysis.
 
 ## Decision
 
-TBD — do not lock a winner before local Godot 4.7.1 results exist.
+Not locked yet.
+
+Current evidence still favors YARD for this project because its independent Resource model aligns better with stable IDs, Git isolation, Codex editing and future content packs. DataTables remains competitive for bulk table editing/CSV workflows, but the row_id rehydration issue is a real implementation concern that must be counted in the final decision.

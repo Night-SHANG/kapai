@@ -100,5 +100,9 @@ Invoke-Godot -Arguments @("--headless","--editor","--path",$DataTables,"--import
 Write-Host "[P0] Running DataTables preflight"
 Invoke-Godot -Arguments @("--headless","--path",$DataTables,"--script","res://scripts/preflight.gd") -Label "DataTables preflight" | Out-Null
 
-Write-Host "[P0] Automated bootstrap completed without fatal Godot script errors."
+Write-Host "[P0] Running format/diff/merge analysis"
+& $Python (Join-Path $Here "analyze_formats.py")
+if ($LASTEXITCODE -ne 0) { throw "Format analysis failed" }
+
+Write-Host "[P0] Automated bootstrap and format analysis completed."
 Write-Host "[P0] This is still not the final data-layer decision."
