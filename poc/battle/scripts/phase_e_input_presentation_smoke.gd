@@ -35,14 +35,21 @@ func _run() -> void:
     root.add_child(scene)
     current_scene = scene
 
-    var manager_scene := load("res://addons/card-framework/card_manager.tscn") as PackedScene
-    if manager_scene == null:
-        _fail("Card Framework CardManager scene failed to load", 2)
+    # Do not instantiate card_manager.tscn here. Its _ready() starts the
+    # framework JSONCardFactory, which would introduce a second content source
+    # next to YARD and is outside this presentation-only smoke.
+    #
+    # Hand only needs the CardManager layout/registration contract, so create the
+    # framework CardManager object without adding it to SceneTree and expose it
+    # through the scene-root meta path that CardContainer officially supports.
+    var manager_script = load("res://addons/card-framework/card_manager.gd")
+    if manager_script == null:
+        _fail("Card Framework CardManager script failed to load", 2)
         return
 
-    var manager := manager_scene.instantiate()
+    var manager = manager_script.new()
     manager.debug_mode = false
-    scene.add_child(manager)
+    scene.set_meta("card_manager", manager)
 
     var hand_script = load("res://addons/card-framework/hand.gd")
     if hand_script == null:
@@ -60,17 +67,23 @@ func _run() -> void:
     hand.enable_drop_zone = false
     hand.align_drop_zone_size_with_current_hand_size = false
     hand.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    manager.add_child(hand)
+    scene.add_child(hand)
 
     await process_frame
 
     if hand.card_manager == null:
-        _fail("Presentation Hand did not discover CardManager", 4)
+        _fail("Presentation Hand did not discover CardManager via scene-root meta", 4)
+        return
+    if hand.card_manager != manager:
+        _fail("Presentation Hand discovered unexpected CardManager", 5)
+        return
+    if manager.card_factory != null:
+        _fail("Presentation-only CardManager must not initialize JSON CardFactory", 6)
         return
 
     var presenter_script = load("res://scripts/card_framework_presenter.gd")
     if presenter_script == null:
-        _fail("Card Framework presenter script failed to load", 5)
+        _fail("Card Framework presenter script failed to load", 7)
         return
     var presenter = presenter_script.new()
     var presentation: Dictionary = presenter.render_hand(hand, HAND_IDS)
@@ -80,23 +93,23 @@ func _run() -> void:
     hand.set_process(false)
 
     if not bool(presentation.get("ok", false)):
-        _fail("Presenter failed: %s" % JSON.stringify(presentation), 6)
+        _fail("Presenter failed: %s" % JSON.stringify(presentation), 8)
         return
     if int(presentation.get("count", 0)) != 6:
-        _fail("Expected six rendered cards", 7)
+        _fail("Expected six rendered cards", 9)
         return
     if not bool(presentation.get("framework_interaction_disabled", false)):
-        _fail("Card Framework drag interaction must be disabled in presentation-only adapter", 8)
+        _fail("Card Framework drag interaction must be disabled in presentation-only adapter", 10)
         return
 
     var state_after := JSON.stringify(battle_state)
     if state_after != state_before:
-        _fail("Presentation mutated BattleState", 9)
+        _fail("Presentation mutated BattleState", 11)
         return
 
     var router_script = load("res://scripts/battle_input_router.gd")
     if router_script == null:
-        _fail("Battle input router script failed to load", 10)
+        _fail("Battle input router script failed to load", 12)
         return
     var router = router_script.new()
     router.configure(HAND_IDS)
@@ -129,19 +142,19 @@ func _run() -> void:
     var gamepad_command: Dictionary = router.handle_event(confirm)
 
     if mouse_command.is_empty() or keyboard_command.is_empty() or gamepad_command.is_empty():
-        _fail("One or more input paths did not emit a BattleCommand", 11)
+        _fail("One or more input paths did not emit a BattleCommand", 13)
         return
     if JSON.stringify(mouse_command) != JSON.stringify(keyboard_command):
-        _fail("Mouse and keyboard commands diverged", 12)
+        _fail("Mouse and keyboard commands diverged", 14)
         return
     if JSON.stringify(mouse_command) != JSON.stringify(gamepad_command):
-        _fail("Mouse and gamepad commands diverged", 13)
+        _fail("Mouse and gamepad commands diverged", 15)
         return
     if String(mouse_command.get("card_id", "")) != HAND_IDS[2]:
-        _fail("Unified input path selected wrong card", 14)
+        _fail("Unified input path selected wrong card", 16)
         return
     if router.command_log.size() != 3:
-        _fail("Expected exactly three routed commands", 15)
+        _fail("Expected exactly three routed commands", 17)
         return
 
     var summary := {
@@ -174,7 +187,7 @@ func _run() -> void:
     DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://result/runtime"))
     var file := FileAccess.open("res://result/runtime/phase_e_summary.json", FileAccess.WRITE)
     if file == null:
-        _fail("Could not write Phase E summary", 16)
+        _fail("Could not write Phase E summary", 18)
         return
     file.store_string(JSON.stringify(summary, "  "))
     file.close()
