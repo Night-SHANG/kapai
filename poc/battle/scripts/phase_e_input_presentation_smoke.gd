@@ -93,7 +93,7 @@ func _run() -> void:
     var mouse := InputEventMouseButton.new()
     mouse.button_index = MOUSE_BUTTON_LEFT
     mouse.pressed = true
-    var mouse_command := router.handle_event(mouse, HAND_IDS[2])
+    var mouse_command: Dictionary = router.handle_event(mouse, HAND_IDS[2])
 
     router.reset_selection()
     for _i in range(2):
@@ -104,7 +104,7 @@ func _run() -> void:
     var enter := InputEventKey.new()
     enter.keycode = KEY_ENTER
     enter.pressed = true
-    var keyboard_command := router.handle_event(enter)
+    var keyboard_command: Dictionary = router.handle_event(enter)
 
     router.reset_selection()
     for _i in range(2):
@@ -115,7 +115,7 @@ func _run() -> void:
     var confirm := InputEventJoypadButton.new()
     confirm.button_index = JOY_BUTTON_A
     confirm.pressed = true
-    var gamepad_command := router.handle_event(confirm)
+    var gamepad_command: Dictionary = router.handle_event(confirm)
 
     if mouse_command.is_empty() or keyboard_command.is_empty() or gamepad_command.is_empty():
         _fail("One or more input paths did not emit a BattleCommand", 11)
