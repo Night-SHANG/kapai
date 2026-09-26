@@ -1,6 +1,6 @@
 # P0-3 Three-character Card Battle
 
-Status: PHASE A TECHNICAL WINNER — PER_CHARACTER_QUOTA / VERIFYING GREEN RUN
+Status: AUTOMATED TECHNICAL BASELINE COMPLETE / HUMAN + INPUT + PRESENTATION SMOKE PENDING
 
 Engine: Godot 4.7.1 stable / Windows x64
 
@@ -150,3 +150,116 @@ Phase C next:
 - deterministic replay
 
 The final production battle rule still requires later human playtest.
+
+## Phase C — Formation + Sync
+
+Final automated run:
+GitHub Actions 36255956059 — SUCCESS
+
+Technical fixture:
+- draw model: per_character_quota
+- action model: 3 Card Plays
+- preferred-position card bonus: +2
+- position threat cost scales with distance from required position
+- Sync triggers only: Mark consume / Intercept / Link
+- 1000 runs × 12 turns
+- deterministic replay
+
+### Free arbitrary adjustment
+
+- formation needs: 4482
+- adjustments: 4476
+- fully resolved: 4476
+- resolution rate: 99.8661%
+- avg cards played: 3.0
+- natural Sync total: 3093
+- Sync per 3 turns: 0.77325
+- explicit Sync-farm opportunity: 3.5833%
+- utility sacrificed per extra farmed Sync: 1.67338
+
+Interpretation:
+This nearly erases formation pressure. If any character can freely jump to any slot every turn, position mostly becomes a reversible optimization rather than a meaningful constraint.
+
+### Free adjacent adjustment
+
+- formation needs: 4452
+- adjustments attempted: 4445
+- fully resolved: 2908
+- full-resolution rate: 65.3190%
+- avg cards played: 3.0
+- natural Sync total: 2900
+- Sync per 3 turns: 0.725
+- explicit Sync-farm opportunity: 3.7417%
+- utility sacrificed per extra farmed Sync: 1.65957
+
+Interpretation:
+This preserves the full 3 Card Plays while leaving a meaningful amount of unresolved position pressure. A front-to-rear relocation can require more than one turn, so formation is not an unlimited free teleport.
+
+### Formation costs 1 Card Play
+
+- formation needs: 4452
+- adjustments/resolutions: 1406
+- resolution rate: 31.5813%
+- avg cards played: 2.88283
+- action costs paid: 1406
+- natural Sync total: 3397
+- Sync per 3 turns: 0.84925
+- deterministic replay: PASS
+
+Sensitivity sweep:
+- low threat values: essentially no paid movement
+- medium threat values: partial movement response
+- high threat values: abrupt heavy movement response and lower card throughput
+
+Interpretation:
+Charging a full Card Play makes movement highly sensitive to tuning thresholds and directly competes with the main card decision layer.
+
+## Phase C technical baseline
+
+SELECT:
+one free adjacent Formation Adjustment per turn.
+
+Do not use:
+- unlimited arbitrary free swap
+- ordinary formation move costing one Card Play
+
+Future exception:
+Sync/Command may buy an additional or stronger emergency formation adjustment.
+
+## Sync result
+
+The restricted three-trigger model produced about 0.725 natural Sync per 3 turns under the selected adjacent-move model.
+
+Dedicated Sync-farm opportunities occurred on only ~3.74% of turns, and taking the extra Sync sacrificed ~1.66 utility on average.
+
+This supports the intended role:
+Sync should emerge from already-useful cross-character cooperation rather than become a second basic energy meter that players farm every turn.
+
+## Automated P0-3 technical baseline
+
+- Draw: independent per-character Draw/Discard
+- Equipped cards: 8 per character
+- Hand quota: 2 per character
+- Visible combined hand: 6
+- Retain unused cards
+- Redraw: same-character replacement
+- Normal action economy: 3 Card Plays
+- Rare Heavy exception may cost 2 Plays
+- Formation: 1 free adjacent adjustment per turn
+- Sync: advanced team resource from meaningful cross-character triggers
+- Battle domain remains deterministic/headless-authoritative
+
+## Still pending before full P0-3 closure
+
+Automated architecture testing cannot establish fun, readability or input quality.
+
+Required later smoke:
+- human short battles / Elite / Boss-like sessions
+- keyboard navigation
+- controller navigation
+- mouse selection/targeting
+- CardSelectionController -> BattleCommand input path
+- Card Framework presentation-only integration
+- scene-level visual/readability smoke
+
+These do not invalidate the automated technical baseline, but P0-3 should not be marked fully complete until they are exercised.
