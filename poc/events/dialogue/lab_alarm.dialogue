@@ -1,0 +1,7 @@
+~ intro
+System: A security alarm wakes the laboratory guard.
+=> END
+
+~ option_engage
+System: Engage the security unit.
+=> END
