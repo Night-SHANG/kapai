@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "items": {
+    "scrap": {"max_stack": 99, "weight": 0.2, "key_item": false, "slot_tags": []},
+    "data_fragment": {"max_stack": 50, "weight": 0.1, "key_item": false, "slot_tags": []},
+    "core_fragment": {"max_stack": 10, "weight": 0.5, "key_item": false, "slot_tags": []},
+    "breach_charge": {"max_stack": 4, "weight": 1.5, "key_item": false, "slot_tags": ["tool"]},
+    "hack_kit": {"max_stack": 1, "weight": 1.0, "key_item": false, "slot_tags": ["tool"]},
+    "repair_kit": {"max_stack": 5, "weight": 1.2, "key_item": false, "slot_tags": ["tool"]},
+    "scanner": {"max_stack": 1, "weight": 0.4, "key_item": false, "slot_tags": ["utility"]},
+    "emergency_beacon": {"max_stack": 2, "weight": 3.0, "key_item": false, "slot_tags": ["utility"]},
+    "portable_power": {"max_stack": 3, "weight": 2.5, "key_item": false, "slot_tags": ["power"]},
+    "key_archive_item": {"max_stack": 1, "weight": 0.0, "key_item": true, "slot_tags": []}
+  }
+}
