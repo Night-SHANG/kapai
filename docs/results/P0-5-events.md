@@ -108,3 +108,34 @@ Correction:
 - Runtime EventDefinitions point to those generated resources.
 - DialogueManager runtime autoload remains enabled.
 - This keeps real Dialogue Manager compiler/runtime coverage without coupling P0 verification to its editor UI theme.
+
+
+## Run #5 — generated EventDefinition UID persistence
+
+- Run ID: 36281750826
+- commit: debd7f67a6b62adbcf8eba99e67c6f5dd42ef3ab
+- result: failure
+
+Confirmed before failure:
+- all pinned dependencies PASS
+- static Event Preflight PASS
+- headless class scan PASS with Dialogue Manager editor UI disabled
+- raw .dialogue -> DialogueResource compile PASS (3 resources)
+- EventDefinition generation PASS (3 resources)
+
+Failure:
+- YARD registry construction rejected `event_test_sealed_lab.tres` because `ResourceLoader.get_resource_uid()` returned an invalid UID.
+- This repeats a Godot 4.7 script-mode behavior already solved in P0-1: `ResourceSaver.save()` alone does not guarantee a generated .tres gets a persisted UID.
+
+Correction:
+- reuse the P0-1/YARD resource-generation rule:
+  - `ResourceSaver.save(..., ResourceSaver.FLAG_CHANGE_PATH)`
+  - `ResourceUID.create_id_for_path(path)`
+  - `ResourceSaver.set_uid(path, uid)`
+  - register the UID in the running ResourceUID cache if needed
+- registry remains fail-closed if any generated resource has no valid UID.
+
+Fix commit:
+- `b81e9be1b4ef3597245c0fc1daeee7aa0ca5b4a8`
+
+A new P0 Events run was triggered. Result pending.
