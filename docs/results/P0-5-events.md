@@ -1,6 +1,6 @@
 # P0-5 World Event Pipeline
 
-Status: IMPLEMENTED — CI RESULT PENDING
+Status: PASS — TECHNICAL DECISION COMPLETE
 
 Engine baseline: Godot 4.7.1 stable / Windows x64.
 
@@ -80,11 +80,27 @@ The P0 reuses the pre-agreed sealed-laboratory fixture rather than inventing new
 
 Additional fixtures exist only to test battle continuation and cooldown history.
 
-## Decision discipline
+## Final decision
 
-No final P0-5 architecture verdict is recorded until the GitHub Actions run is inspected.
+P0-5 is technically complete.
 
-A passing run must prove that the complete pipeline can execute without Dialogue UI and that enabling real Dialogue Manager does not move gameplay authority into dialogue files.
+Selected architecture:
+
+- YARD remains the static EventDefinition authority.
+- WorldState remains the sole permanent world-state authority.
+- EventConditionEvaluator is pure-read and composable.
+- EventResolver owns business execution order.
+- EventCommands apply transactionally against draft state and commit only after the full option succeeds.
+- Dialogue Manager v4.1.0 remains Narrative/Presentation only.
+- Raw .dialogue files are compiled with the real DMCompiler for headless CI; the full Dialogue Manager editor UI is not part of runtime verification.
+- UI/presentation returns only option_id to EventResolver.
+- Preview is derived from the same command data as execution.
+- EventHistory in WorldState owns once/cooldown behavior.
+- StartBattle uses explicit pending battle + EventContinuation rather than implicit scene-only signals.
+- Save boundary is committed domain state only; unselected UI state is not persisted.
+- Critical-event reference/reachability/localization/dialogue mutation checks belong in Game Preflight.
+
+No additional event-framework plugin is adopted as the world-event core. The project keeps a thin custom Event Domain because the remaining logic is project-specific and is now proven headlessly testable.
 
 
 ## Run #2 — Dialogue Manager Headless Editor UI failure
@@ -171,3 +187,42 @@ Fix commit:
 - `56d4eb72b7daaf35ffa0556fb9a51aaa4996c8e0`
 
 A new P0 Events run was triggered. Result pending.
+
+
+## Run #7 — FINAL PASS
+
+- Run ID: 36282696128
+- commit: 56d4eb72b7daaf35ffa0556fb9a51aaa4996c8e0
+- result: success
+- job: Windows Godot 4.7.1 P0-5
+
+Validated:
+- pinned YARD / Dialogue Manager / GdUnit4 dependencies PASS
+- static Event Preflight PASS: 3 events / 14 conditions / 14 commands
+- raw .dialogue -> DialogueResource compile PASS: 3 resources
+- EventDefinition generation PASS: 3 resources
+- YARD registry PASS: 3 stable-ID entries
+- GdUnit4 PASS: 7/7, 0 failures
+- FTL-style special option availability PASS
+- command atomicity PASS
+- command-derived preview PASS
+- Once / Cooldown / EventHistory PASS
+- EventHistory JSON round-trip semantics PASS
+- StartBattle + win/retreat/wipe continuation path PASS
+- runtime event-chain reachability PASS
+- Dialogue Manager presentation-only bridge PASS
+- option_id return PASS
+- WorldState unchanged by presentation PASS
+- full headless integration smoke PASS
+
+Artifact:
+- name: p0-5-events-results
+- ID: 10919412153
+- SHA256: 6cfe7b9774c71c8785e961412ece62a71a7c04662d817c168fc747234fa88244
+
+Non-blocking observations:
+- GdUnit startup reports remote debugger port 0 and headless graphics/audio fallback warnings.
+- Final smoke exits with 3 ObjectDB instances and 2 resources still in use.
+- These are P0 harness cleanup debt, not failures of the selected Event Domain architecture.
+
+P0-5 technical stage is closed. Next technical validation: P0-6 Save / Restore / Migration.
