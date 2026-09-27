@@ -93,6 +93,21 @@ func test_battle_continuation() -> void:
     assert_int(int(state["resources"]["data"])).is_equal(2)
     assert_bool(bool(state["world_flags"]["lab_guard_defeated"])).is_true()
 
+func test_event_history_json_roundtrip_preserves_semantics() -> void:
+    var sealed: Dictionary = events["event_test_sealed_lab"]
+    var state := _base_state()
+    assert_bool(bool(domain.resolve_option(sealed, "option_force", state)["ok"])).is_true()
+
+    var restored: Variant = JSON.parse_string(JSON.stringify(state))
+    assert_bool(restored is Dictionary).is_true()
+    var restored_state: Dictionary = restored
+    var history: Dictionary = restored_state.get("event_history", {})
+    var entry: Dictionary = history.get("event_test_sealed_lab", {})
+
+    assert_int(int(entry.get("times", -1))).is_equal(1)
+    assert_int(int(entry.get("last_cycle", -1))).is_equal(1)
+    assert_bool(domain.is_event_available(sealed, restored_state)).is_false()
+
 func _base_state() -> Dictionary:
     return {
         "world_cycle": 1,

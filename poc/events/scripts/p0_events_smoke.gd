@@ -101,8 +101,19 @@ func _run() -> void:
 
     var save_text := JSON.stringify(resolve_state)
     var restored: Variant = JSON.parse_string(save_text)
-    if not restored is Dictionary or restored.get("event_history", {}) != resolve_state.get("event_history", {}):
-        _fail("EventHistory JSON round-trip failed", 17)
+    if not restored is Dictionary:
+        _fail("EventHistory JSON round-trip did not restore a Dictionary", 17)
+        return
+    var restored_state: Dictionary = restored
+    var original_history: Dictionary = resolve_state.get("event_history", {})
+    var restored_history: Dictionary = restored_state.get("event_history", {})
+    var original_entry: Dictionary = original_history.get("event_test_sealed_lab", {})
+    var restored_entry: Dictionary = restored_history.get("event_test_sealed_lab", {})
+    if int(restored_entry.get("times", -1)) != int(original_entry.get("times", -1))     or int(restored_entry.get("last_cycle", -1)) != int(original_entry.get("last_cycle", -1)):
+        _fail("EventHistory JSON round-trip changed persisted semantics", 17)
+        return
+    if domain.is_event_available(sealed, restored_state):
+        _fail("Restored EventHistory no longer enforces once semantics", 17)
         return
 
     if not domain.is_event_available(alarm, resolve_state):
