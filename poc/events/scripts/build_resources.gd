@@ -30,10 +30,27 @@ func _init() -> void:
         payload["dialogue_resource"] = _runtime_dialogue_path(dialogue_source)
         definition.payload = payload
         var path := "%s/%s.tres" % [EVENT_DIR, event_id]
-        var err := ResourceSaver.save(definition, path)
+        var err := ResourceSaver.save(definition, path, ResourceSaver.FLAG_CHANGE_PATH)
         if err != OK:
             push_error("Failed saving EventDefinition %s: %s" % [event_id, error_string(err)])
             quit(5)
+            return
+
+        # Reuse the P0-1/YARD rule: Godot 4.7 script-mode ResourceSaver does
+        # not guarantee that a generated .tres gets a persisted UID.
+        # YARD stable-ID registries require a real Resource UID.
+        var uid_int := ResourceUID.create_id_for_path(path)
+        var uid_err := ResourceSaver.set_uid(path, uid_int)
+        if uid_err != OK:
+            push_error("Failed assigning UID to EventDefinition %s: %s" % [event_id, error_string(uid_err)])
+            quit(6)
+            return
+        if not ResourceUID.has_id(uid_int):
+            ResourceUID.add_id(uid_int, path)
+        var uid_text := ResourceUID.id_to_text(uid_int)
+        if not String(uid_text).begins_with("uid://"):
+            push_error("Invalid persisted EventDefinition UID %s: %s" % [event_id, uid_text])
+            quit(7)
             return
 
     print("[P0-5:YARD] EventDefinition resources built: %d" % rows.size())
