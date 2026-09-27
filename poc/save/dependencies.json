@@ -1,0 +1,28 @@
+{
+  "engine": {
+    "name": "Godot",
+    "version": "4.7.1-stable",
+    "platform": "windows-x64"
+  },
+  "candidates": {
+    "savestate": {
+      "repo": "youssof20/savestate",
+      "version": "v2.0.0",
+      "commit": "22b912aebbc6b52b3b31f74d3d83fec48b53870c",
+      "license": "MIT"
+    },
+    "enhanced_save_system": {
+      "repo": "Amiyadesi/enhance_save_system",
+      "version": "pinned-main",
+      "commit": "dc92d0bead1c449f36462f22e823b603e356e49a",
+      "license": "MIT"
+    },
+    "gdunit4": {
+      "repo": "godot-gdunit-labs/gdUnit4",
+      "version": "v6.2.1",
+      "commit": "08ffc7c65b61b1b2edd545616061a99973c13ce1",
+      "license": "MIT"
+    }
+  },
+  "project_save_schema": 3
+}
