@@ -25,7 +25,10 @@ func _init() -> void:
             quit(4)
             return
         var definition = EventDefinitionClass.new()
-        definition.payload = row.duplicate(true)
+        var payload: Dictionary = row.duplicate(true)
+        var dialogue_source := String(payload.get("dialogue_resource", ""))
+        payload["dialogue_resource"] = _runtime_dialogue_path(dialogue_source)
+        definition.payload = payload
         var path := "%s/%s.tres" % [EVENT_DIR, event_id]
         var err := ResourceSaver.save(definition, path)
         if err != OK:
@@ -42,3 +45,6 @@ func _load_json_array(path: String) -> Array:
         return []
     var parsed: Variant = JSON.parse_string(file.get_as_text())
     return parsed if parsed is Array else []
+
+func _runtime_dialogue_path(source_path: String) -> String:
+    return "res://data/dialogue/%s.tres" % source_path.get_file().get_basename()

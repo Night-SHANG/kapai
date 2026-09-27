@@ -85,3 +85,26 @@ Additional fixtures exist only to test battle continuation and cooldown history.
 No final P0-5 architecture verdict is recorded until the GitHub Actions run is inspected.
 
 A passing run must prove that the complete pipeline can execute without Dialogue UI and that enabling real Dialogue Manager does not move gameplay authority into dialogue files.
+
+
+## Run #2 — Dialogue Manager Headless Editor UI failure
+
+- Run ID: 36281323156
+- commit: cbddfd01a9978b62109768c30054c7566f9b90c6
+- result: failure
+
+Confirmed before failure:
+- all pinned dependencies PASS
+- static Event Preflight PASS: 3 events / 14 conditions / 14 commands
+
+Failure:
+- Dialogue Manager v4.1.0 full EditorPlugin was enabled during Windows headless editor import.
+- DMThemeValues requested editor-theme values that are Nil in this headless environment.
+- The failure occurred in editor presentation initialization before Event Domain/GdUnit/runtime smoke.
+
+Correction:
+- Dialogue Manager's full EditorPlugin is no longer enabled in P0-5 headless CI.
+- The real v4.1.0 DMCompiler.compile_string() compiles canonical raw .dialogue sources into generated DialogueResource .tres files.
+- Runtime EventDefinitions point to those generated resources.
+- DialogueManager runtime autoload remains enabled.
+- This keeps real Dialogue Manager compiler/runtime coverage without coupling P0 verification to its editor UI theme.
