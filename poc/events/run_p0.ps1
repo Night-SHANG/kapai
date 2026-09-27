@@ -63,14 +63,17 @@ if ($LASTEXITCODE -ne 0) { throw "P0-5 Event Preflight failed" }
 $DataDir = Join-Path $Here "data"
 if (Test-Path $DataDir) { Remove-Item -Recurse -Force $DataDir }
 
-Write-Host "[P0-5] Initial editor import for plugins/dialogue importer"
-Invoke-Godot -Arguments @("--headless","--editor","--path",$Here,"--import") -Label "P0-5 initial import" -TimeoutSeconds 45 | Out-Null
+Write-Host "[P0-5] Initial editor scan for addon global classes (Dialogue Manager editor UI disabled)"
+Invoke-Godot -Arguments @("--headless","--editor","--path",$Here,"--import") -Label "P0-5 initial class scan" -TimeoutSeconds 45 | Out-Null
+
+Write-Host "[P0-5] Compiling raw .dialogue files with Dialogue Manager compiler"
+Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/build_dialogue_resources.gd") -Label "P0-5 dialogue compile" | Out-Null
 
 Write-Host "[P0-5] Building YARD EventDefinition resources"
 Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/build_resources.gd") -Label "P0-5 resource build" | Out-Null
 
-Write-Host "[P0-5] Re-importing generated EventDefinition resources"
-Invoke-Godot -Arguments @("--headless","--editor","--path",$Here,"--import") -Label "P0-5 UID/dialogue import" -TimeoutSeconds 45 | Out-Null
+Write-Host "[P0-5] Re-importing generated EventDefinition and DialogueResource files"
+Invoke-Godot -Arguments @("--headless","--editor","--path",$Here,"--import") -Label "P0-5 generated resource import" -TimeoutSeconds 45 | Out-Null
 
 Write-Host "[P0-5] Building YARD event registry"
 Invoke-Godot -Arguments @("--headless","--path",$Here,"--script","res://scripts/build_registry.gd") -Label "P0-5 registry build" | Out-Null
