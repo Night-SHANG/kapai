@@ -11,6 +11,7 @@ Rules:
 - YARD is the static Definition authority.
 - The lightweight project-owned Inventory model is represented by stable item_id/count state.
 - Dialogue Manager is presentation only. Event dialogue files are rejected by Preflight if they contain gameplay mutations.
+- Headless CI does not enable Dialogue Manager's editor UI plugin; raw .dialogue files are compiled with the real v4.1.0 DMCompiler into generated DialogueResource .tres files before runtime smoke.
 - UI/presentation never mutates WorldState directly.
 - Resolver applies commands atomically against a draft state and commits only when the whole command set succeeds.
 - Preview is derived from the same command data.
