@@ -29,3 +29,12 @@ poc/inventory/generated/
 
 # P0-5 generated YARD event resources/registry
 poc/events/data/
+
+# P0-6 generated fixture copies, test reports, and result artifacts
+poc/save/savestate/fixtures/
+poc/save/enhanced/fixtures/
+poc/save/savestate/reports/
+poc/save/enhanced/reports/
+poc/save/savestate/result/
+poc/save/enhanced/result/
+poc/save/result/

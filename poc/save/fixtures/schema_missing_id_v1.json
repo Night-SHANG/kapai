@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "game_version": "0.0-p0",
+  "profile": {
+    "profile_id": "profile_missing",
+    "world_cycle": 1
+  },
+  "world": {
+    "flags": {},
+    "locations": {},
+    "routes": []
+  },
+  "characters": [
+    {
+      "id": "char_bastion",
+      "hp": 20,
+      "max_hp": 20,
+      "injuries": []
+    }
+  ],
+  "inventory": {
+    "stacks": [
+      {
+        "item_id": "item_deleted_unknown",
+        "count": 1
+      }
+    ]
+  }
+}
