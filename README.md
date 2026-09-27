@@ -4,41 +4,54 @@ Godot 2D 末日科幻小队远征 + 三人卡牌战斗项目。
 
 ## 当前阶段
 
-当前仓库处于 **P0 / Preflight 验证阶段**，不是正式游戏主干。
+六个 P0 的**技术架构裁决已经完成**，但尚未进入正式游戏主干开发。
 
-目标不是提前制作完整游戏，而是用隔离、可丢弃的 PoC 验证关键架构：
+当前剩余关键门槛：
+1. P0-3 Human Playtest（基础战 / Elite / Boss-like，鼠标 / 键盘 / 手柄与可读性）。
+2. 根据试玩最终确认 Card Framework 的正式状态。
+3. P0 后少量规则修订。
+4. 锁定第一章 / Vertical Slice 最小正式内容范围。
+5. 制作视觉样板。
+6. 建立正式 game mainline 与 Production Preflight。
 
-1. 数据层：YARD vs Godot DataTables
-2. Effect / Status：GodotGAS vs 轻量模型
-3. 三人卡牌战斗：抽牌公平性 + 3 Card Plays vs 共享 4 AP
-4. Inventory：GLoot vs 轻量 ItemStack
-5. 世界事件链：EventDefinition → Dialogue → Command → WorldState
-6. 存档：SaveState Lite vs Enhanced Save System
+## P0 最终技术基线
 
-六个 P0 的技术架构验证现已全部完成；P0-3 仍保留 Human Playtest 待办。下一阶段是汇总并锁定正式依赖、数据 Schema 与技术架构，完成 P0 后文字修订和视觉样板，再进入正式开发。
+- P0-1 Data：YARD。
+- P0-2 Effect / Status：项目自有轻量 EffectRuntime。
+- P0-3 Battle：三人独立牌堆 + 2×3 手牌 + 3 Card Plays + 1 次相邻 Formation + Sync；技术验证完成，Human Playtest Pending。
+- P0-4 Inventory：项目自有轻量 Inventory Domain。
+- P0-5 Event：项目自有薄 Event Domain + Dialogue Manager 表现层。
+- P0-6 Save：SaveState Lite v2.0.0。
+
+详见：
+- `docs/decisions/p0-final-summary.md`
+- `docs/architecture/production-baseline-v1.md`
+- `docs/architecture/core-schema-v1.md`
+- `third_party/dependencies.lock.json`
 
 ## 引擎基线
 
 - Godot **4.7.1 stable**
+- Official build：`4.7.1.stable.official.a13da4feb`
 - Windows x64
-- 用户本地可执行文件：`Godot_v4.7.1-stable_win64.exe`
+- 本地可执行文件：`Godot_v4.7.1-stable_win64.exe`
 
-除非明确执行引擎升级流程，否则 P0、Preflight、CI 与正式开发都必须使用 4.7.1 stable。
+除非执行正式升级流程，否则 Preflight、CI 与正式开发都使用 4.7.1 stable。
 
 ## 知识与代码职责
 
 - **Notion**：项目设计、母版研究、技术决策、P0 结论、开发记录、变更说明的长期知识库。
 - **GitHub / 本仓库**：可执行代码、测试、fixtures、Preflight、CI、依赖锁与结果文件。
 
-聊天中的重要结论需要同步回 Notion；代码改动则在 Notion 记录其用途与结果。
+重要结论同步回 Notion；可执行事实进入 GitHub。
 
 ## 目录
 
 ```text
 docs/
-  decisions/           # P0 最终技术裁决
-  architecture/        # P0 后正式架构文档
-  results/             # P0 实测结果摘要（不放巨型二进制）
+  decisions/           # P0 最终技术裁决与汇总
+  architecture/        # P0 后正式架构与 Schema 基线
+  results/             # P0 实测结果摘要
 poc/
   data_layer/          # P0-1
   effect_layer/        # P0-2
@@ -47,28 +60,27 @@ poc/
   events/              # P0-5
   save/                # P0-6
 scripts/
-  preflight/           # 通用 Preflight / 版本检查
-  tools/               # fixture/数据生成等开发脚本
+  preflight/           # 通用 / 项目契约 Preflight
+  tools/               # fixture / 数据工具
 third_party/
-  README.md            # 第三方依赖安装与许可证说明
+  dependencies.lock.json
+  README.md
 ```
 
-## P0 状态术语
+## 状态术语
 
-- `UPSTREAM_SUPPORTED`：上游声明覆盖 Godot 4.7.1。
-- `P0_VERIFIED`：已在本项目 Godot 4.7.1 上真实运行验证。
-- `LOCKED`：P0 通过并锁定精确 tag/commit。
+- `P0_VERIFIED`：已在本项目 Godot 4.7.1 上真实验证。
+- `LOCKED`：正式基线锁定精确 tag/commit。
+- `PROVISIONAL_LOCK`：精确版本已固定，但仍有明确人工验收门槛。
 
-README/插件声明不能替代本项目实测。
+当前 Card Framework 属于 `PROVISIONAL_LOCK`，直到 P0-3 Human Playtest 完成。
 
-## 当前首个任务
+## 开发纪律
 
-P0-1 数据层对照实验：
-
-- YARD 1.2.x / 固定 commit
-- Godot DataTables 1.0.0 / 固定 commit
-- GdUnit4 6.2.x
-- 同一套 fixture
-- 比较 Stable ID、Git diff/merge、Codex 编辑、Schema 演进、Runtime Query、批量平衡与插件锁定风险。
-
-详见 `poc/data_layer/README.md`。
+- 通用系统先找成熟轮子，再决定复用、包装或自研。
+- 玩法机制先研究成熟商业范式。
+- Definition 与 Runtime State 分离。
+- Save 只存 stable ID 和项目 DTO，不持久化插件运行时对象。
+- UI/表现层不得直接改权威 Domain State。
+- 修改后先 Level 1 / Preflight，再完整 Build/Package/Runtime。
+- 可自动发现的问题尽量沉淀成新的 Preflight/回归规则。

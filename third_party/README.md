@@ -1,15 +1,61 @@
 # Third-party dependencies
 
-本仓库当前不直接提交第三方插件源码。P0 使用脚本从上游仓库按固定 Tag + Commit 安装到各自隔离项目的 addons/。
+The formal dependency identity is now recorded in `third_party/dependencies.lock.json`.
 
-目的：避免误跟踪 main；明确实际测试版本；每个 P0 只安装最小依赖；未来正式锁定后再决定 vendoring/submodule/安装脚本策略。
+P0 comparison addons are still installed on demand inside isolated PoC projects and are not automatically production dependencies.
 
-P0-1 当前锁定候选：
+## Production-facing baseline
 
-- YARD v1.2.0 @ 48a518b4bec03c8b5ad446f57a2b669110a1752b — MIT
-- Godot DataTables v1.0.1 @ f405b187b013e3914b812db201f014ac946335a3 — MIT
+Runtime:
+- YARD v1.2.0 @ 48a518b4bec03c8b5ad446f57a2b669110a1752b — MIT — static Definition registry
+- Card Framework v1.4.0 @ a74b713863adb27a22965a8e6ed039d0c4016791 — MIT — presentation only; provisional until P0-3 Human Playtest
+- Dialogue Manager v4.1.0 @ a719088aea342572f29b5559fd8726896c9519b2 — MIT — narrative/presentation only
+- SaveState Lite v2.0.0 @ 22b912aebbc6b52b3b31f74d3d83fec48b53870c — MIT — save I/O/generation/recovery only
+
+Development:
 - GdUnit4 v6.2.1 @ 08ffc7c65b61b1b2edd545616061a99973c13ce1 — MIT
 
-注意：DataTables v1.0.1 Release 加入 enum support，但当前 plugin.cfg 仍报告 1.0.0。因此依赖身份以 Tag + Commit 为准。
+Engine:
+- Godot 4.7.1 stable / official build 4.7.1.stable.official.a13da4feb
 
-正式分发前还要生成完整 Third-Party Notices。
+## Project-owned instead of external runtime frameworks
+
+- DefinitionRegistry adapter
+- EffectRuntime
+- Battle Domain
+- Inventory Domain
+- World/Fortress/Character state
+- Event Domain
+- Save DTO/schema/migrations
+- RNG service
+
+## P0 reference-only candidates
+
+These were evaluated but are not production runtime dependencies:
+- Godot DataTables
+- GodotGAS
+- GLoot
+- Enhanced Save System
+- FlowKit
+
+Do not reintroduce one of these into the production addon set without a new architecture decision and affected regression tests.
+
+## Version rule
+
+No floating `main`.
+
+Changing a locked dependency requires:
+1. dedicated branch/PR
+2. license recheck
+3. affected GdUnit/Preflight suites
+4. save migration regression when persistence is affected
+5. manifest update only after validation
+
+## License handling
+
+All currently locked external plugins are MIT at the pinned references and their upstream license file paths are recorded in the manifest.
+
+Before public distribution:
+- retain the required copyright/license notices
+- generate a complete Third-Party Notices file from the actual packaged dependency set
+- recheck any optional dependencies adopted after this baseline

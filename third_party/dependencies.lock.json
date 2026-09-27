@@ -1,0 +1,123 @@
+{
+  "manifest_version": 1,
+  "generated_from": "P0-1..P0-6 technical decisions",
+  "engine": {
+    "id": "godot",
+    "version": "4.7.1-stable",
+    "official_build": "4.7.1.stable.official.a13da4feb",
+    "platform": "windows-x64",
+    "status": "locked"
+  },
+  "runtime_dependencies": [
+    {
+      "id": "yard",
+      "repository": "elliotfontaine/yard-godot",
+      "tag": "v1.2.0",
+      "commit": "48a518b4bec03c8b5ad446f57a2b669110a1752b",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "status": "locked",
+      "purpose": "static Definition registry and stable-ID content authority",
+      "authority_boundary": "access through project DefinitionRegistry adapter; gameplay code must not scatter direct YARD calls"
+    },
+    {
+      "id": "card_framework",
+      "repository": "chun92/card-framework",
+      "tag": "v1.4.0",
+      "commit": "a74b713863adb27a22965a8e6ed039d0c4016791",
+      "license": "MIT",
+      "license_path": "LICENSE.md",
+      "status": "provisional_locked_pending_human_playtest",
+      "purpose": "card/hand/pile presentation layer",
+      "authority_boundary": "must not own BattleState, draw order, action economy, formation, RNG, or undo"
+    },
+    {
+      "id": "dialogue_manager",
+      "repository": "nathanhoad/godot_dialogue_manager",
+      "tag": "v4.1.0",
+      "commit": "a719088aea342572f29b5559fd8726896c9519b2",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "status": "locked",
+      "purpose": "dialogue text, branch presentation, cue resolution, localization-facing narrative presentation",
+      "authority_boundary": "returns option_id only; must not mutate WorldState/Inventory/Threat or other permanent gameplay state"
+    },
+    {
+      "id": "savestate_lite",
+      "repository": "youssof20/savestate",
+      "tag": "v2.0.0",
+      "commit": "22b912aebbc6b52b3b31f74d3d83fec48b53870c",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "status": "locked",
+      "purpose": "save I/O, retained generations, validation and recovery",
+      "authority_boundary": "project owns Save DTO/schema/migrations/stable-ID policy; SaveState is storage and recovery only"
+    }
+  ],
+  "development_dependencies": [
+    {
+      "id": "gdunit4",
+      "repository": "godot-gdunit-labs/gdUnit4",
+      "tag": "v6.2.1",
+      "commit": "08ffc7c65b61b1b2edd545616061a99973c13ce1",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "status": "locked",
+      "purpose": "unit/integration/headless regression testing"
+    }
+  ],
+  "project_owned_domains": [
+    "DefinitionRegistry adapter",
+    "EffectRuntime",
+    "BattleState/BattleCommand/BattleResolver",
+    "InventoryState/Inventory Domain",
+    "WorldState/FortressState/CharacterState",
+    "EventConditionEvaluator/EventResolver/EventCommands",
+    "Save DTO/schema/migrations",
+    "RNG stream service"
+  ],
+  "p0_reference_only_not_production_dependencies": [
+    {
+      "id": "godot_datatables",
+      "repository": "yulrun/godot-data-tables-addon",
+      "tag": "v1.0.1",
+      "commit": "f405b187b013e3914b812db201f014ac946335a3"
+    },
+    {
+      "id": "godot_gas",
+      "repository": "yulrun/godot-gas",
+      "tag": "v1.1.0",
+      "commit": "42ae230840bfbe4d62629e6f5d1d5ba1a65a4a3b"
+    },
+    {
+      "id": "gloot",
+      "repository": "peter-kish/gloot",
+      "tag": "v3.0.2",
+      "commit": "ce88b7adc7b952b4df8ebe4836339de334d0d0cc"
+    },
+    {
+      "id": "enhanced_save_system",
+      "repository": "Amiyadesi/enhance_save_system",
+      "commit": "dc92d0bead1c449f36462f22e823b603e356e49a"
+    }
+  ],
+  "unresolved_optional_dependencies": [
+    "menu/settings/input helper suite",
+    "audio manager",
+    "world map presentation/editor helper",
+    "UI/combat tween and juice helpers",
+    "runtime profiler",
+    "autosim runner",
+    "mod loader"
+  ],
+  "upgrade_policy": {
+    "floating_main_forbidden": true,
+    "required_for_change": [
+      "dedicated branch/PR",
+      "license recheck",
+      "affected Preflight/GdUnit suites",
+      "save migration regression when persistence is affected",
+      "explicit manifest update after green validation"
+    ]
+  }
+}

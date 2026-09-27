@@ -1,0 +1,26 @@
+name: Architecture Lock
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "third_party/dependencies.lock.json"
+      - "docs/architecture/**"
+      - "scripts/preflight/check_architecture_lock.py"
+      - ".github/workflows/architecture-lock.yml"
+  workflow_dispatch:
+
+jobs:
+  architecture-lock:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Validate architecture and dependency locks
+        shell: pwsh
+        run: python .\scripts\preflight\check_architecture_lock.py

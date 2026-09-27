@@ -1,0 +1,56 @@
+{
+  "contract_version": 1,
+  "production_save_schema_version": 1,
+  "note": "P0 save fixtures v1/v2/v3/v4 are synthetic migration fixtures and are not production release schema history.",
+  "definition_authority": "YARD via project DefinitionRegistry adapter",
+  "permanent_world_authority": "WorldState",
+  "save_backend": "SaveState Lite v2.0.0",
+  "stable_id_storage_only": true,
+  "resource_paths_forbidden_as_business_keys": true,
+  "definitions": [
+    "CharacterDefinition",
+    "CardDefinition",
+    "StatusDefinition",
+    "EffectDefinition",
+    "ModuleDefinition",
+    "EnemyDefinition",
+    "EnemyIntentDefinition",
+    "ItemDefinition",
+    "LocationDefinition",
+    "EventDefinition",
+    "FacilityDefinition",
+    "ResearchDefinition",
+    "RegionDefinition"
+  ],
+  "runtime_states": [
+    "CharacterState",
+    "ItemStack",
+    "InventoryState",
+    "LocationState",
+    "WorldState",
+    "FortressState",
+    "ExpeditionState",
+    "BattleState",
+    "EventHistory",
+    "TutorialState",
+    "RNGServiceState",
+    "SaveProfile"
+  ],
+  "rng_streams": [
+    "battle_draw",
+    "enemy_ai",
+    "loot",
+    "event",
+    "world"
+  ],
+  "persistence_rules": {
+    "node_references_forbidden": true,
+    "scene_instances_forbidden": true,
+    "plugin_runtime_objects_forbidden": true,
+    "definitions_serialized_by_id_only": true,
+    "migrations_owned_by_project": true,
+    "newer_schema_fail_closed": true,
+    "missing_critical_definition_fail_closed": true,
+    "save_only_committed_domain_state": true
+  }
+}
