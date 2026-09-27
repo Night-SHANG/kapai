@@ -1,21 +1,22 @@
-# Visual Baseline v1
+# Visual Baseline v1.1
 
 Status: SELECTED FOR REFINEMENT
 Date: 2026-09-27
 
-The first visual comparison sheet has been reviewed. The unified direction is:
+The first visual comparison sheet has been reviewed.
 
+Selected:
 - Fortress: A1
 - Old City map: B1
-- Battle: C3
+- Battle: C3 **UI information language only**
 
-These are not three unrelated styles. They are combined into one visual language.
+The C3 camera/staging shown in the first sheet is rejected. It drifted toward near-3D cinematic combat and does not match the project's 2D combat model.
 
 ## Unified art direction
 
 Overall:
 - semi-realistic / realistic sci-fi
-- post-apocalypse after the event, not active catastrophe
+- post-apocalypse after the event
 - old-world high-technology ruins
 - quiet, empty, cold atmosphere
 - small amounts of warm warning/service lighting
@@ -26,67 +27,99 @@ Overall:
 UI:
 - dark technical command-interface base
 - restrained cyan/blue for neutral/system information
-- orange/red reserved for Threat, warning, hostility and irreversible consequences
-- thin lines, modular panels, strong information hierarchy
-- large readable typography
+- orange/red for Threat, warning, hostility and irreversible consequences
+- thin lines, modular panels, strong hierarchy
+- readable typography
 - decoration never overrules readability
 
 ## Fortress master — A1
 
 Keep:
-- monumental interior industrial architecture
-- sense of vertical scale and long-term inhabited command base
-- dark steel structure with limited warm utility lights
-- clear permanent navigation rail and resource/status hierarchy
-- the base feels functional, not luxurious
-
-Refine:
-- reduce visual clutter behind text
-- strengthen separation between world scene and UI panels
-- make squad/prep entry more prominent
-- reserve space for future maintenance/workshop/codex status without overcrowding
+- monumental industrial interior
+- vertical scale and long-term command-base feeling
+- dark steel + limited warm utility lights
+- permanent navigation and resource hierarchy
 
 ## Old City map master — B1
 
 Keep:
-- real-world ruined city visible below/behind the tactical layer
-- route graph sits on a recognizable environment rather than becoming a pure blueprint
-- nodes feel like real locations
-- Threat and local intelligence remain always legible
+- recognizable ruined city underneath a tactical route layer
+- route graph tied to real locations
+- persistent Threat/intelligence visibility
+- distinct silhouettes for current node, objective, extraction and danger
 
-Refine:
-- route lines must be readable without covering city identity
-- node icons use stable shape language, not color alone
-- main objective / extraction / current position / unresolved danger receive distinct silhouettes
-- route state, known danger and special-event information should be inspectable without turning the map into a spreadsheet
+## Battle presentation — corrected
 
-## Battle master — C3
+### Camera / staging
 
-Keep:
-- grounded cinematic ruined-street battlefield
-- three allies and enemies readable as physical combatants, not UI tokens
-- battle UI remains subordinate to the battlefield
-- hand anchored at the bottom
-- visible Intent and target information
+Formal direction:
+**2D side-view tactical stage**, not top-down and not 3D.
 
-Refine:
-- six-card hand must clearly show owner identity through portrait + frame/shape, not color only
-- Card Plays / Redraw / Formation / Sync grouped as one compact tactical resource area
-- ally HP/status and enemy Intent hierarchy must be clearer than decorative card art
-- formation positions should be perceptible immediately
-- avoid oversized character sprites that leave no room for targeting lines / VFX / status information
+- player team occupies the left side
+- enemies occupy the right side
+- the battlefield is read horizontally
+- Vanguard / Mid / Rear are explicit linear slots
+- slight painted perspective/parallax is allowed in the background
+- characters remain 2D static/semi-static PNG sprites
+- no free 3D camera, no navigable ground plane, no implied grid
+
+Why not top-down:
+the battle rules do not contain free movement, tiles, range geometry, cover or flanking coordinates. A top-down view would falsely promise a spatial tactics game.
+
+Why not C3 cinematic 3D:
+it over-emphasizes scene spectacle and under-emphasizes the actual card/formation/intent information model.
+
+### Mature-reference hierarchy
+
+Use different mature games for different responsibilities:
+
+- **SteamWorld Quest**: primary structural battle reference — 3-character party, 6-card hand, 3 plays, 2 redraws, retained cards.
+- **Trials of Fire**: multi-character card-source and bad-hand handling reference.
+- **Marvel's Midnight Suns**: shared Card Plays and deterministic execution/prediction reference.
+- **Slay the Spire**: enemy Intent and readable card/status presentation.
+- **Into the Breach**: prediction clarity and “known board state” information discipline.
+- **Darkest Dungeon**: useful visual/staging reference for readable left-vs-right party/enemy lineup and strong silhouette separation; not a mechanical combat template.
+- **Card Framework**: presentation implementation helper only; it does not dictate camera, battle state, formation or rules.
+
+### Formal battle layout
+
+Top 60-65%:
+- 2D battlefield illustration
+- allies left, enemies right
+- clear formation slot anchors
+- enemy Intent directly above/near each enemy
+- target lines / preview overlays appear only when needed
+- HP / Shield / critical statuses stay close to entities
+
+Bottom 30-35%:
+- unified 6-card hand
+- card owner shown by portrait + frame/shape, never color alone
+- selected-card detail/preview expands without covering the battlefield
+
+Compact tactical resource cluster:
+- Card Plays 3/3
+- Redraw 2/2
+- Formation 1/1
+- Sync
+- End Turn separated to prevent misclick
+
+The battlefield must preserve empty visual space for:
+- target preview
+- formation arrows
+- VFX
+- status changes
+- damage/heal numbers
 
 ## Production consequence
 
-This direction becomes the source for:
+The corrected battle direction becomes the source for:
 - UI component bible
-- environment visual bible
-- character battle-scale rules
-- icon/status/intent language
-- Codex/image-generation prompt templates
-- Godot layout targets
+- battle composition guide
+- character sprite scale
+- formation slot layout
+- intent/status icon language
+- Godot Battle Scene layout
+- image-generation prompts
 
-Next visual pass should produce three separate 16:9 polished master mockups using this unified language:
-1. Fortress overview
-2. Old City region map
-3. Standard battle
+Next master mockup:
+generate the battle screen specifically as a **2D side-view card battle interface** based on this corrected reference hierarchy.
