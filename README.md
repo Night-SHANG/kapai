@@ -4,21 +4,21 @@ Godot 2D 末日科幻小队远征 + 三人卡牌战斗项目。
 
 ## 当前阶段
 
-六个 P0 的**技术架构裁决已经完成**，但尚未进入正式游戏主干开发。
+六个 P0 的**技术架构裁决已经完成**，正式依赖、Core Schema v1、Architecture Lock 和 Vertical Slice v1 范围均已锁定。
 
-当前剩余关键门槛：
-1. P0-3 Human Playtest（基础战 / Elite / Boss-like，鼠标 / 键盘 / 手柄与可读性）。
-2. 根据试玩最终确认 Card Framework 的正式状态。
-3. P0 后少量规则修订。
-4. 锁定第一章 / Vertical Slice 最小正式内容范围。
-5. 制作视觉样板。
-6. 建立正式 game mainline 与 Production Preflight。
+不再单独开发 P0-3 Human Playtest Build。人工战斗体验验收合并进正式 Vertical Slice 的 Battle Scene / Dev Battle Lab。
+
+当前开发前只剩：
+1. 堡垒总览视觉样板。
+2. 旧城区区域地图视觉样板。
+3. 标准战斗视觉样板。
+4. 随后建立正式 game mainline，并一次性搭起 Vertical Slice Production Skeleton + Preflight。
 
 ## P0 最终技术基线
 
 - P0-1 Data：YARD。
 - P0-2 Effect / Status：项目自有轻量 EffectRuntime。
-- P0-3 Battle：三人独立牌堆 + 2×3 手牌 + 3 Card Plays + 1 次相邻 Formation + Sync；技术验证完成，Human Playtest Pending。
+- P0-3 Battle：三人独立牌堆 + 2×3 手牌 + 3 Card Plays + 1 次相邻 Formation + Sync；技术验证完成，人工体验验证并入正式 Vertical Slice。
 - P0-4 Inventory：项目自有轻量 Inventory Domain。
 - P0-5 Event：项目自有薄 Event Domain + Dialogue Manager 表现层。
 - P0-6 Save：SaveState Lite v2.0.0。
@@ -27,6 +27,8 @@ Godot 2D 末日科幻小队远征 + 三人卡牌战斗项目。
 - `docs/decisions/p0-final-summary.md`
 - `docs/architecture/production-baseline-v1.md`
 - `docs/architecture/core-schema-v1.md`
+- `docs/planning/vertical-slice-v1.md`
+- `docs/planning/ai-native-execution.md`
 - `third_party/dependencies.lock.json`
 
 ## 引擎基线
@@ -51,6 +53,7 @@ Godot 2D 末日科幻小队远征 + 三人卡牌战斗项目。
 docs/
   decisions/           # P0 最终技术裁决与汇总
   architecture/        # P0 后正式架构与 Schema 基线
+  planning/            # Vertical Slice 与 AI-native 执行计划
   results/             # P0 实测结果摘要
 poc/
   data_layer/          # P0-1
@@ -73,7 +76,7 @@ third_party/
 - `LOCKED`：正式基线锁定精确 tag/commit。
 - `PROVISIONAL_LOCK`：精确版本已固定，但仍有明确人工验收门槛。
 
-当前 Card Framework 属于 `PROVISIONAL_LOCK`，直到 P0-3 Human Playtest 完成。
+当前 Card Framework 属于 `PROVISIONAL_LOCK`，直到正式 Vertical Slice 的 Battle Scene / Dev Battle Lab 完成人工体验验收。
 
 ## 开发纪律
 
@@ -84,3 +87,5 @@ third_party/
 - UI/表现层不得直接改权威 Domain State。
 - 修改后先 Level 1 / Preflight，再完整 Build/Package/Runtime。
 - 可自动发现的问题尽量沉淀成新的 Preflight/回归规则。
+- 默认采用 AI-native 批处理：按依赖/风险/可验证性分批，不按人类 Sprint 或人工工时人为拆小。
+- 若正式实现可以承担验证，不额外制造会被丢弃的临时版本。
