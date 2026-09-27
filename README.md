@@ -15,7 +15,7 @@ Godot 2D 末日科幻小队远征 + 三人卡牌战斗项目。
 5. 世界事件链：EventDefinition → Dialogue → Command → WorldState
 6. 存档：SaveState Lite vs Enhanced Save System
 
-六个 P0 完成后，才锁定正式依赖、数据 Schema、技术架构；随后修订最终文字方案、制作视觉样板，再进入正式开发。
+六个 P0 的技术架构验证现已全部完成；P0-3 仍保留 Human Playtest 待办。下一阶段是汇总并锁定正式依赖、数据 Schema 与技术架构，完成 P0 后文字修订和视觉样板，再进入正式开发。
 
 ## 引擎基线
 
