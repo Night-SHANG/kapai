@@ -70,7 +70,12 @@ foreach ($ProjectName in @("savestate","enhanced")) {
     finally { Pop-Location }
 
     Write-Host "[P0-6] $ProjectName integration / corruption / migration / benchmark"
-    $Smoke = "res://scripts/" + ($(if ($ProjectName -eq "savestate") { "savestate_smoke.gd" } else { "enhanced_smoke.gd" }))
+    if ($ProjectName -eq "savestate") {
+        $Smoke = "res://scripts/savestate_smoke.gd"
+    }
+    else {
+        $Smoke = "res://scripts/enhanced_smoke.gd"
+    }
     Invoke-Godot -Arguments @("--headless","--path",$Project,"--quit-after","900","--script",$Smoke) -Label "$ProjectName smoke" -TimeoutSeconds 90 | Out-Null
 }
 
