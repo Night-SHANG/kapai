@@ -1,6 +1,6 @@
 # P0-6 Save / Restore / Migration
 
-Status: IMPLEMENTED — CI RESULT PENDING
+Status: PASS — TECHNICAL DECISION COMPLETE
 
 Engine baseline: Godot 4.7.1 stable / Windows x64.
 
@@ -59,10 +59,96 @@ Both candidates are tested against the same semantic requirements:
 - repeated saves
 - 8 characters / 100+ flags / 100+ locations / 500+ EventHistory / 1000 stacks benchmark
 
-## Candidate-specific observation to verify
+## Final result
 
-SaveState Lite exposes retained immutable generations and explicit recovery APIs. Enhanced Save System exposes atomic .tmp + optional .bak, module-based collection/application, and migration around its save-format version.
+Final GitHub Actions run:
+- workflow: P0 Save
+- run: 36283764675
+- commit: 5802f98bdd796aee6161da9fcac41c6cc81ab5c5
+- result: success
+- artifact: p0-6-save-results
+- artifact ID: 10919349183
+- artifact SHA256: 7723d444c5df28fc567d3fb364be0a35a125df25d508c73aabbc642df48f95d5
 
-P0 must determine whether Enhanced's module model satisfies project-owned schema evolution and Fail Closed requirements without binding business schema to plugin file-format version.
+### SaveState Lite v2.0.0
 
-No final winner is recorded until GitHub Actions on Godot 4.7.1 is inspected.
+Hard requirements: PASS.
+
+Validated:
+- Godot 4.7.1 stable
+- current schema round-trip
+- mid-expedition restore
+- battle turn-boundary deterministic resume
+- project-owned ordered schema migration
+- stable-ID alias migration
+- missing critical ID fail-closed
+- newer schema rejection
+- corruption detection
+- retained immutable generation history
+- automatic recovery from an older valid generation
+- damaged-generation evidence preservation
+- interrupted-write residue safety
+- repeated saves
+- large-save round-trip
+- explicit failure status
+- recovery history API
+
+Extreme benchmark fixture:
+- 8 characters
+- 120 world flags
+- 120 locations
+- 500 EventHistory entries
+- 1000 Inventory stacks
+- file size: 405,806 bytes
+- save: 267,972 µs
+- load: 251,122 µs
+
+The Lite backend is synchronous. This is acceptable only with the already-defined safe save boundaries; it must not be invoked in the middle of EventCommand transactions, every frame, or on latency-sensitive combat input.
+
+### Enhanced Save System
+
+Hard requirements: FAIL.
+
+Validated:
+- ordinary round-trip
+- expedition restore
+- deterministic battle resume
+- migration fixture
+- missing-ID fail-closed
+- corruption detection
+- explicit read_failed reason
+- atomic tmp behavior
+- .bak manual recovery
+- repeated saves
+- large-save round-trip
+
+Blocking differences:
+- newer-schema rejection: FAIL. A format version newer than the current SaveWriter format is not rejected by the built-in migration path.
+- retained generation history: absent.
+- automatic older-generation recovery: absent.
+- business schema evolution is more coupled to the plugin's SaveWriter.FORMAT_VERSION / module migration model than desired.
+
+Extreme benchmark fixture:
+- file size: 90,045 bytes
+- save: 7,138 µs
+- load: 5,540 µs
+
+Enhanced is materially faster/smaller in this benchmark, but the project prioritizes recoverability, explicit schema ownership, and fail-closed compatibility over raw save throughput.
+
+## Decision
+
+Select **SaveState Lite v2.0.0** as the production save I/O / generation / recovery layer.
+
+Project-owned responsibilities remain outside the plugin:
+- Save DTO schema
+- schema_version
+- ordered migrations
+- stable-ID aliases / removal policy
+- Registry re-resolution after load
+- autosave commit boundaries
+- gameplay state validation
+- recovery UX wording
+
+SaveState is not allowed to become a gameplay-domain authority. It persists and recovers project-owned DTO state.
+
+P0-6 technical decision complete.
