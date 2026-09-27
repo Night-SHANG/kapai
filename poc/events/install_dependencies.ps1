@@ -37,4 +37,4 @@ function Install-PinnedAddon {
 
 Install-PinnedAddon -Name "yard" -Repository "https://github.com/elliotfontaine/yard-godot.git" -Tag "v1.2.0" -Commit "48a518b4bec03c8b5ad446f57a2b669110a1752b" -SubPath "addons\yard" -DestinationName "yard"
 Install-PinnedAddon -Name "dialogue-manager" -Repository "https://github.com/nathanhoad/godot_dialogue_manager.git" -Tag "v4.1.0" -Commit "a719088aea342572f29b5559fd8726896c9519b2" -SubPath "addons\dialogue_manager" -DestinationName "dialogue_manager"
-Install-PinnedAddon -Name "gdunit4" -Repository "https://github.com/godot-gdunit-labs/gdUnit4.git" -Tag "v6.2.1" -Commit "08ffc7c65b61b2edd545616061a99973c13ce1" -SubPath "addons\gdUnit4" -DestinationName "gdUnit4"
+Install-PinnedAddon -Name "gdunit4" -Repository "https://github.com/godot-gdunit-labs/gdUnit4.git" -Tag "v6.2.1" -Commit "08ffc7c65b61b1b2edd545616061a99973c13ce1" -SubPath "addons\gdUnit4" -DestinationName "gdUnit4"
