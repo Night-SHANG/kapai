@@ -102,10 +102,11 @@ func _run() -> void:
     var manual_recovery_ok := false
     if FileAccess.file_exists(bak_path):
         var corrupt_copy := SLOT_PATH + ".corrupt"
-        DirAccess.copy_absolute(SLOT_PATH, corrupt_copy)
-        DirAccess.copy_absolute(bak_path, SLOT_PATH)
+        var evidence_copy_err := DirAccess.copy_absolute(SLOT_PATH, corrupt_copy)
+        var remove_main_err := DirAccess.remove_absolute(SLOT_PATH)
+        var restore_copy_err := DirAccess.copy_absolute(bak_path, SLOT_PATH) if remove_main_err == OK else FAILED
         _clear_modules()
-        manual_recovery_ok = manager.load_slot(1)
+        manual_recovery_ok = evidence_copy_err == OK and remove_main_err == OK and restore_copy_err == OK and manager.load_slot(1)
         report["damaged_evidence_preserved"] = FileAccess.file_exists(corrupt_copy)
     report["manual_backup_recovery"] = manual_recovery_ok
 
