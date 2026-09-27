@@ -139,3 +139,35 @@ Fix commit:
 - `b81e9be1b4ef3597245c0fc1daeee7aa0ca5b4a8`
 
 A new P0 Events run was triggered. Result pending.
+
+
+## Run #6 — EventHistory JSON round-trip assertion
+
+- Run ID: 36282202655
+- commit: b81e9be1b4ef3597245c0fc1daeee7aa0ca5b4a8
+- result: failure
+
+Confirmed before failure:
+- all pinned dependencies PASS
+- static Event Preflight PASS
+- Dialogue Manager headless compile PASS
+- EventDefinition generation PASS
+- YARD registry PASS (3 entries)
+- GdUnit4 domain tests PASS (6/6)
+
+Failure:
+- full integration smoke stopped at the EventHistory JSON round-trip assertion.
+- The assertion compared the whole deserialized Dictionary directly with the pre-serialization Dictionary.
+- JSON numeric values can return with a different Variant numeric representation even when their persisted meaning is unchanged.
+
+Correction:
+- validate persisted EventHistory semantically:
+  - `times`
+  - `last_cycle`
+  - restored once-event availability behavior
+- add a dedicated GdUnit regression test proving JSON round-trip preserves EventHistory semantics.
+
+Fix commit:
+- `56d4eb72b7daaf35ffa0556fb9a51aaa4996c8e0`
+
+A new P0 Events run was triggered. Result pending.
