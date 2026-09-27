@@ -1,0 +1,316 @@
+{
+  "schema_version": 3,
+  "game_version": "0.0-p0",
+  "profile": {
+    "profile_id": "profile_test",
+    "display_name": "P0 Save",
+    "world_cycle": 18,
+    "last_commit": "event_test_sealed_lab"
+  },
+  "world": {
+    "flags": {
+      "lab_opened": true,
+      "lab_guard_defeated": true
+    },
+    "locations": {
+      "location_test_sealed_lab": {
+        "state": "cleared",
+        "local_flags": {
+          "lab_opened": true
+        }
+      },
+      "location_hunter": {
+        "state": "discovered",
+        "local_flags": {}
+      }
+    },
+    "routes": [
+      "route_a",
+      "route_lab"
+    ],
+    "restored_facilities": [
+      "facility_relay_test"
+    ]
+  },
+  "fortress": {
+    "resources": {
+      "scrap": 144,
+      "data": 33,
+      "core": 4
+    },
+    "power_capacity": 12,
+    "modules": [
+      "module_test_guard"
+    ],
+    "maintenance": {
+      "char_falcon": 2
+    }
+  },
+  "characters": [
+    {
+      "id": "char_bastion",
+      "hp": 17,
+      "max_hp": 20,
+      "injuries": [],
+      "reconstruction": "restored"
+    },
+    {
+      "id": "char_falcon",
+      "hp": 11,
+      "max_hp": 16,
+      "injuries": [
+        "injury_test"
+      ],
+      "reconstruction": "restored"
+    },
+    {
+      "id": "char_loom",
+      "hp": 14,
+      "max_hp": 16,
+      "injuries": [],
+      "reconstruction": "restored"
+    },
+    {
+      "id": "char_04",
+      "hp": 12,
+      "max_hp": 15,
+      "injuries": [],
+      "reconstruction": "salvaged"
+    },
+    {
+      "id": "char_05",
+      "hp": 13,
+      "max_hp": 15,
+      "injuries": [],
+      "reconstruction": "salvaged"
+    },
+    {
+      "id": "char_06",
+      "hp": 15,
+      "max_hp": 15,
+      "injuries": [],
+      "reconstruction": "salvaged"
+    },
+    {
+      "id": "char_07",
+      "hp": 10,
+      "max_hp": 14,
+      "injuries": [],
+      "reconstruction": "salvaged"
+    },
+    {
+      "id": "char_08",
+      "hp": 14,
+      "max_hp": 14,
+      "injuries": [],
+      "reconstruction": "salvaged"
+    }
+  ],
+  "research": {
+    "unlocked": [
+      "research_old_access_protocol",
+      "research_test_a"
+    ]
+  },
+  "inventory": {
+    "max_weight": 80,
+    "secure_weight": 10,
+    "stacks": [
+      {
+        "item_id": "item_core_fragment",
+        "count": 3
+      },
+      {
+        "item_id": "item_breach_charge_test",
+        "count": 1
+      },
+      {
+        "item_id": "item_scrap_test",
+        "count": 20
+      },
+      {
+        "item_id": "item_med_test",
+        "count": 4
+      },
+      {
+        "item_id": "item_module_a",
+        "count": 1
+      },
+      {
+        "item_id": "item_module_b",
+        "count": 1
+      },
+      {
+        "item_id": "item_tool_a",
+        "count": 2
+      },
+      {
+        "item_id": "item_key_archive",
+        "count": 1
+      },
+      {
+        "item_id": "item_material_a",
+        "count": 40
+      },
+      {
+        "item_id": "item_material_b",
+        "count": 12
+      }
+    ]
+  },
+  "event_history": {
+    "event_test_sealed_lab": {
+      "times": 1,
+      "last_cycle": 17
+    },
+    "event_test_lab_alarm": {
+      "times": 1,
+      "last_cycle": 17
+    },
+    "event_test_scavenger_ping": {
+      "times": 3,
+      "last_cycle": 18
+    }
+  },
+  "tutorial": {
+    "seen": [
+      "intro_move",
+      "intro_cards"
+    ],
+    "dismissed": [
+      "hint_threat"
+    ]
+  },
+  "expedition": {
+    "active": true,
+    "region_id": "region_test",
+    "location_id": "location_test_sealed_lab",
+    "threat": 58,
+    "carry_weight": 31,
+    "secure_storage": [
+      "item_key_archive"
+    ],
+    "temp_protocols": [
+      "protocol_scan"
+    ],
+    "hunter": {
+      "location_id": "location_hunter",
+      "alert": 2
+    },
+    "party_hp": {
+      "char_bastion": 17,
+      "char_falcon": 11,
+      "char_loom": 14
+    }
+  },
+  "battle": {
+    "active": true,
+    "encounter_id": "encounter_test_lab_guard",
+    "turn": 7,
+    "draw": {
+      "char_bastion": [
+        "card_b1",
+        "card_b2"
+      ],
+      "char_falcon": [
+        "card_f1"
+      ],
+      "char_loom": [
+        "card_l1",
+        "card_l2"
+      ]
+    },
+    "discard": {
+      "char_bastion": [
+        "card_b3"
+      ],
+      "char_falcon": [
+        "card_f2"
+      ],
+      "char_loom": [
+        "card_l3"
+      ]
+    },
+    "hand": {
+      "char_bastion": [
+        "card_b4",
+        "card_b5"
+      ],
+      "char_falcon": [
+        "card_f3",
+        "card_f4"
+      ],
+      "char_loom": [
+        "card_l4",
+        "card_l5"
+      ]
+    },
+    "card_plays_remaining": 3,
+    "redraws_remaining": 2,
+    "formation": [
+      "char_bastion",
+      "char_falcon",
+      "char_loom"
+    ],
+    "sync": 2,
+    "enemy_intents": [
+      {
+        "enemy_id": "enemy_guard_a",
+        "intent": "attack"
+      }
+    ],
+    "active_effects": [
+      {
+        "effect_id": "effect_mark",
+        "target_id": "enemy_guard_a",
+        "stacks": 1,
+        "remaining_turns": 2
+      }
+    ],
+    "triggers": {
+      "counter": [
+        "char_bastion"
+      ],
+      "intercept": [
+        "char_falcon"
+      ]
+    },
+    "enemy_hp": {
+      "enemy_guard_a": 19
+    }
+  },
+  "rng_streams": {
+    "battle_draw": {
+      "state": 1234567
+    },
+    "enemy_ai": {
+      "state": 2345678
+    },
+    "loot": {
+      "state": 3456789
+    },
+    "event": {
+      "state": 4567890
+    },
+    "world": {
+      "state": 5678901
+    }
+  },
+  "migration": {
+    "applied": [
+      "1_to_2",
+      "2_to_3"
+    ],
+    "id_aliases": {
+      "item_old_core": "item_core_fragment"
+    }
+  },
+  "modules": {
+    "installed": [
+      "module_test_guard"
+    ]
+  },
+  "maintenance": {
+    "char_falcon": 2
+  }
+}

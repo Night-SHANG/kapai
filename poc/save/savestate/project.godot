@@ -1,0 +1,11 @@
+; P0-6 SaveState Lite isolated project
+config_version=5
+
+[application]
+config/name="Kapai P0 SaveState"
+
+[editor_plugins]
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
+
+[rendering]
+renderer/rendering_method="gl_compatibility"

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "game_version": "0.0-p0",
+  "profile": {
+    "profile_id": "profile_test",
+    "world_cycle": 18
+  },
+  "world": {
+    "flags": {
+      "lab_opened": true
+    },
+    "locations": {
+      "location_test_sealed_lab": {
+        "state": "opened"
+      }
+    },
+    "routes": [
+      "route_a"
+    ]
+  },
+  "characters": [
+    {
+      "id": "char_bastion",
+      "hp": 17,
+      "max_hp": 20,
+      "injuries": []
+    },
+    {
+      "id": "char_falcon",
+      "hp": 11,
+      "max_hp": 16,
+      "injuries": [
+        "injury_test"
+      ]
+    },
+    {
+      "id": "char_loom",
+      "hp": 14,
+      "max_hp": 16,
+      "injuries": []
+    }
+  ],
+  "inventory": {
+    "stacks": [
+      {
+        "item_id": "item_old_core",
+        "count": 3
+      },
+      {
+        "item_id": "item_breach_charge_test",
+        "count": 1
+      }
+    ]
+  }
+}

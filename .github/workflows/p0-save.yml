@@ -1,0 +1,43 @@
+name: P0 Save
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "poc/save/**"
+      - ".github/workflows/p0-save.yml"
+  workflow_dispatch:
+
+jobs:
+  p0-save:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install Godot 4.7.1 stable
+        shell: pwsh
+        run: |
+          $url = "https://github.com/godotengine/godot-builds/releases/download/4.7.1-stable/Godot_v4.7.1-stable_win64.exe.zip"
+          Invoke-WebRequest -Uri $url -OutFile godot.zip
+          Expand-Archive godot.zip -DestinationPath godot
+          $binary = (Resolve-Path "godot/Godot_v4.7.1-stable_win64.exe").Path
+          "GODOT_EXE=$binary" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          & $binary --version
+      - name: Run P0-6 Save suite
+        shell: pwsh
+        run: .\poc\save\run_p0.ps1 -GodotExe "$env:GODOT_EXE"
+      - name: Upload P0-6 result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-6-save-results
+          path: |
+            poc/save/result/
+            poc/save/savestate/result/
+            poc/save/enhanced/result/
+          if-no-files-found: ignore

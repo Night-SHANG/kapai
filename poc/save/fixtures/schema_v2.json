@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "game_version": "0.0-p0",
+  "profile": {
+    "profile_id": "profile_test",
+    "world_cycle": 18
+  },
+  "world": {
+    "flags": {
+      "lab_opened": true
+    },
+    "locations": {
+      "location_test_sealed_lab": {
+        "state": "opened"
+      }
+    },
+    "routes": [
+      "route_a"
+    ]
+  },
+  "characters": [
+    {
+      "id": "char_bastion",
+      "hp": 17,
+      "max_hp": 20,
+      "injuries": []
+    },
+    {
+      "id": "char_falcon",
+      "hp": 11,
+      "max_hp": 16,
+      "injuries": [
+        "injury_test"
+      ]
+    },
+    {
+      "id": "char_loom",
+      "hp": 14,
+      "max_hp": 16,
+      "injuries": []
+    }
+  ],
+  "inventory": {
+    "stacks": [
+      {
+        "item_id": "item_core_fragment",
+        "count": 3
+      },
+      {
+        "item_id": "item_breach_charge_test",
+        "count": 1
+      }
+    ]
+  },
+  "expedition": {
+    "active": true,
+    "region_id": "region_test",
+    "location_id": "location_test_sealed_lab",
+    "threat": 58,
+    "carry_weight": 31,
+    "secure_storage": [
+      "item_key_archive"
+    ],
+    "temp_protocols": [
+      "protocol_scan"
+    ],
+    "hunter": {
+      "location_id": "location_hunter",
+      "alert": 2
+    },
+    "party_hp": {
+      "char_bastion": 17,
+      "char_falcon": 11,
+      "char_loom": 14
+    }
+  },
+  "rng_streams": {
+    "battle_draw": {
+      "state": 1234567
+    },
+    "enemy_ai": {
+      "state": 2345678
+    },
+    "loot": {
+      "state": 3456789
+    },
+    "event": {
+      "state": 4567890
+    },
+    "world": {
+      "state": 5678901
+    }
+  }
+}

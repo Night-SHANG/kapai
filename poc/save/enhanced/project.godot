@@ -1,0 +1,11 @@
+; P0-6 Enhanced Save System isolated project
+config_version=5
+
+[application]
+config/name="Kapai P0 Enhanced Save"
+
+[editor_plugins]
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
+
+[rendering]
+renderer/rendering_method="gl_compatibility"

@@ -1,0 +1,47 @@
+{
+  "schema_version": 4,
+  "game_version": "future-p0",
+  "profile": {
+    "profile_id": "profile_future",
+    "world_cycle": 30
+  },
+  "world": {
+    "flags": {
+      "future_flag": true
+    },
+    "locations": {},
+    "routes": []
+  },
+  "characters": [],
+  "inventory": {
+    "stacks": []
+  },
+  "expedition": {
+    "active": false
+  },
+  "rng_streams": {
+    "battle_draw": {
+      "state": 1
+    },
+    "enemy_ai": {
+      "state": 2
+    },
+    "loot": {
+      "state": 3
+    },
+    "event": {
+      "state": 4
+    },
+    "world": {
+      "state": 5
+    }
+  },
+  "event_history": {},
+  "modules": {
+    "installed": []
+  },
+  "maintenance": {},
+  "future_only": {
+    "requires_engine": "future"
+  }
+}
