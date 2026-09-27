@@ -7,6 +7,7 @@ const SLOT_PATH := "user://saves/slot_01.json"
 
 var manager: Variant
 var modules: Dictionary = {}
+var last_failure_reason: String = ""
 
 func _init() -> void:
     call_deferred("_run")
@@ -27,6 +28,7 @@ func _run() -> void:
     manager.split_modules_enabled = false
     root.add_child(manager)
     await process_frame
+    manager.slot_load_failed.connect(_on_slot_load_failed)
 
     manager.register_migration(1, Callable(self, "_migration_1_to_2"))
     manager.register_migration(2, Callable(self, "_migration_2_to_3"))
@@ -95,8 +97,10 @@ func _run() -> void:
         broken.store_string("P0_CORRUPTED_SAVE")
         broken.close()
     _clear_modules()
+    last_failure_reason = ""
     var corrupted_load: bool = manager.load_slot(1)
     report["corruption_detected"] = not corrupted_load
+    report["corruption_failure_reason"] = last_failure_reason
     report["automatic_recovery"] = false
     report["damaged_evidence_preserved"] = FileAccess.file_exists(SLOT_PATH)
     var manual_recovery_ok := false
@@ -150,7 +154,7 @@ func _run() -> void:
         "locations": 120,
     }
     report["large_save_roundtrip"] = big_save and big_load and Array(big_loaded.get("inventory", {}).get("stacks", [])).size() == 1000
-    report["explicit_error_status"] = true
+    report["explicit_error_status"] = not String(report.get("corruption_failure_reason", "")).is_empty()
     report["recovery_history_api"] = false
 
     report["hard_pass"] = bool(report["roundtrip"]) and bool(report["expedition_resume"])         and bool(report["battle_resume_deterministic"]) and bool(report["migration_pipeline"])         and bool(report["missing_id_fail_closed"]) and bool(report["newer_schema_rejected"])         and bool(report["corruption_detected"]) and bool(report["automatic_recovery"])         and bool(report["damaged_evidence_preserved"]) and bool(report["interrupted_write_residue_safe"])         and bool(report["repeated_saves"]) and bool(report["large_save_roundtrip"])
@@ -159,6 +163,9 @@ func _run() -> void:
     print("[P0-6:ENHANCED] SUMMARY | %s" % JSON.stringify(report))
     print("[P0-6:ENHANCED] COMPLETE")
     quit(0)
+
+func _on_slot_load_failed(_slot: int, reason: String) -> void:
+    last_failure_reason = reason
 
 func _set_state(state: Dictionary) -> void:
     if modules.is_empty():
